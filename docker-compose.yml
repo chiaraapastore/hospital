@@ -1,0 +1,54 @@
+services:
+  keycloak_hospital:
+    container_name: hospital-container
+    image: quay.io/keycloak/keycloak:22.0.3 #dove le immagini sono in questa repository
+    command: start-dev #quando viene avviato keycloak
+    environment: #configurazioni di varie impostazioni
+      KC_HOSTNAME: localhost #nome host
+      KC_HOSTNAME_PORT: 8080 #porta
+      KC_HOSTNAME_STRICT_BACKCHANNEL: 'false'
+      KC_HTTP_ENABLED: 'true'
+      KC_HOSTNAME_STRICT_HTTPS: 'false' #configurazione http
+      KC_HEALTH_ENABLED: 'true' #credenziali amministratore
+
+      #Ambiente specifico per le keycloak: quando carichiamo l'app e andiamo sul browser la presenteremo con una pagina di accesso e dunque dobbiamo caricare un account amministratore in cui posso accedere e creare i gruppi utenti, ecc.
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_ADMIN_URL: "http://localhost:8080"
+      KC_DB: postgres #è il tipo di database che userò
+      KC_DB_URL_HOST: postgres_keycloak_hospital #non lo definiremo localhost perchè significa che qualcosa di diverso  all'interno del contenitore
+      KC_DB_URL_DATABASE: hospital
+      KC_DB_PASSWORD: password
+      KC_DB_URL_USERNAME: keycloak
+      KC_DB_SCHEMA: public
+
+    ports:
+      - "8080:8080" #consente di accedere al contenitore esternamente, mappando sulla porta 8080
+    restart: always
+    depends_on:
+      postgres_keycloak_hospital:
+        condition: service_healthy
+    networks:
+      - keycloak_hospital_dev_network #rete personalizzata che utilizza il driver bridge
+
+  postgres_keycloak_hospital:
+    image: postgres:16 #per eseguire un server postgresql
+    command: postgres -c 'max_connections=200' #numero massimo di connessioni
+    volumes:
+      - /var/lib/postgresql/data #per l'archiviazione persistente dei dati del db
+    environment: #configurazione con il nome postgres_db l'utente e la password
+      POSTGRES_DB: hospital
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: "exit 0"
+    ports:
+      - "5432:5432" #parte esterna
+    networks:
+      - keycloak_hospital_dev_network
+
+volumes:
+  pdgdata_keycloak_hospital:
+networks:
+  keycloak_hospital_dev_network:
+    driver: bridge
