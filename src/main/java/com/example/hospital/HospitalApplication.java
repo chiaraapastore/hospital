@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @ComponentScan(basePackages = {"com.example.hospital"})
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class })
-@SpringBootApplication
 @EnableFeignClients(basePackages = "com.example.hospital.client")
+@SpringBootApplication
 public class HospitalApplication {
 
     public static void main(String[] args) {

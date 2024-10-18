@@ -12,5 +12,6 @@ public class TokenRequest {
     private String password;
     private String clientId;
     private String clientSecret;
-    private String realm;
+    private String grantType;
 }
+
