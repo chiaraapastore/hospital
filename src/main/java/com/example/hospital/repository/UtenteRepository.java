@@ -9,4 +9,5 @@ public interface UtenteRepository extends MongoRepository<Utente, String> {
         return null;
     }
     Utente findByEmail(String username);
+    boolean delete(String email);
 }
