@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -26,13 +24,14 @@ public class SecurityConfig {
     // Iniezione della dipendenza JwtAuthenticationFilter
     //Inietta due componenti: un filtro di autenticazione JWT (JwtAuthenticationFilter) e il convertitore di token JWT (KeycloakJwtTokenConverter).
 
- //Configura la catena di filtri di sicurezza. Disabilita il CSRF (perché si usano i token JWT), definisce regole di accesso per endpoint specifici e aggiunge il filtro di autenticazione JWT prima del filtro di autenticazione di default.
+    //Configura la catena di filtri di sicurezza. Disabilita il CSRF (perché si usano i token JWT), definisce regole di accesso per endpoint specifici e aggiunge il filtro di autenticazione JWT prima del filtro di autenticazione di default.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf->csrf.disable()) // Disabilito la protezione CSRF poiché usiamo JWT
                 .authorizeRequests()
-                .requestMatchers("/api/public/**").permitAll() // Accesso aperto a tutti per endpoint pubblici
+                .requestMatchers("/api/utenti/login/**").permitAll() // Accesso aperto a tutti per endpoint pubblici
+                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // Solo gli utenti con ruolo ADMIN possono accedere agli endpoint admin
                 .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // Gli utenti e admin possono accedere agli endpoint user
                 .anyRequest().authenticated(); // Tutte le altre richieste devono essere autenticate

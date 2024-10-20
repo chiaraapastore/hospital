@@ -10,8 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@ComponentScan(basePackages = {"com.example.hospital"})
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class })
+
 @EnableFeignClients(basePackages = "com.example.hospital.client")
 @SpringBootApplication
 public class HospitalApplication {

@@ -53,8 +53,6 @@ public class KeycloakJwtTokenConverter implements Converter<Jwt, Collection<Gran
                     }
                 }
             }
-
-            // Aggiungi anche le autorizzazioni di default dal converter standard
             result.addAll(jwtGrantedAuthoritiesConverter.convert(jwt));
 
         } catch (Exception e) {

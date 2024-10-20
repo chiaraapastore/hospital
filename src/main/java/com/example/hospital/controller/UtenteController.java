@@ -18,14 +18,13 @@ public class UtenteController {
     @Autowired
     private UtenteService utenteService;
 
-    // Metodo per ottenere tutti gli utenti
+
     @GetMapping
     public List<Utente> getAllUtenti() {
         return utenteService.getAllUtenti();
     }
 
-    // Metodo per ottenere un utente specifico tramite ID
-    @GetMapping("/{id}")
+    @GetMapping("/{email}")
     public ResponseEntity<Utente> getUtenteByEmail(@PathVariable String email) {
         Utente utente = utenteService.getUtenteByEmail(email);
         if (utente == null) {
@@ -33,6 +32,7 @@ public class UtenteController {
         }
         return ResponseEntity.ok(utente);
     }
+
     @PostMapping
     public Utente createUtente(@RequestBody Utente utente) {
         return utenteService.createUtente(utente);
@@ -47,7 +47,7 @@ public class UtenteController {
         return ResponseEntity.ok(updatedUtente);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{email}")
     public ResponseEntity<Void> deleteUtente(@PathVariable String email) {
         boolean isDeleted = utenteService.deleteUtente(email);
         if (!isDeleted) {
@@ -56,7 +56,6 @@ public class UtenteController {
         return ResponseEntity.noContent().build();
     }
 
-    // Metodo per effettuare il login
     @PostMapping("/login")
     public LoginRequest login(@RequestBody LoginRequest loginRequest) {
         LoginRequest isAuthenticated = utenteService.authenticate(loginRequest);

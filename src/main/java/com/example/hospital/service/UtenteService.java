@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UtenteService {
@@ -38,15 +39,25 @@ public class UtenteService {
     }
 
     public Utente updateUtente(String id, Utente utenteDetails) {
+        Optional<Utente> optionalUtente = utenteRepository.findById(id);
+        if (optionalUtente.isPresent()) {
+            Utente utente = optionalUtente.get();
+            utente.setName(utenteDetails.getName());
+        }
         return utenteRepository.save(utenteDetails);
-    }
-
-    public boolean deleteUtente(String email) {
-        return utenteRepository.delete(email);
     }
 
     public LoginRequest authenticate(LoginRequest loginRequest) {
         return loginRequest;
+    }
+
+    public boolean deleteUtente(String email) {
+        Utente optionalUtente = utenteRepository.findByEmail(email);
+        if (optionalUtente != null) {
+            utenteRepository.deleteByEmail(email);
+            return true;
+        }
+        return false;
     }
 }
 

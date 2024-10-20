@@ -2,12 +2,10 @@ package com.example.hospital.config;
 
 import com.example.hospital.utility.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import java.util.*;
 
 @Service
 public class AuthenticationService { // La classe gestisce la decodifica dei token jwt per estrarre informazioni come username, id utente e ruoli di realm.
