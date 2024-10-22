@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.example.hospital.repository.UtenteRepository;
+
 
 @Setter
 @Getter
@@ -18,17 +18,12 @@ import com.example.hospital.repository.UtenteRepository;
 public class Utente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String name;
+    private String id;
+    private String username;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
-    private UtenteRepository utenteRepository;
+    private String role;
 
-
-    public boolean isPresent() {
-        if(utenteRepository.findByEmail(email).isPresent()) {
-            return true;
-        }else{
-            return false;
-        }
-    }
 }

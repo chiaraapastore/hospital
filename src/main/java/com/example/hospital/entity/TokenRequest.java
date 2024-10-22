@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 public class TokenRequest {
     private String username;
     private String password;
-    private String clientId;
-    private String clientSecret;
-    private String grantType;
+    private String client_id;
+    private String client_secret;
+    private String grant_type;
 }
 

@@ -30,8 +30,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf->csrf.disable()) // Disabilito la protezione CSRF poiché usiamo JWT
                 .authorizeRequests()
-                .requestMatchers("/api/utenti/login/**").permitAll() // Accesso aperto a tutti per endpoint pubblici
+                .requestMatchers("/api/login/**").permitAll() // Accesso aperto a tutti per endpoint pubblici
                 .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/create/users/mongo").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // Solo gli utenti con ruolo ADMIN possono accedere agli endpoint admin
                 .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // Gli utenti e admin possono accedere agli endpoint user
                 .anyRequest().authenticated(); // Tutte le altre richieste devono essere autenticate

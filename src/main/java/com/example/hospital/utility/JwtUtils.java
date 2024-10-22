@@ -2,9 +2,19 @@ package com.example.hospital.utility;
 
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.hospital.entity.Utente;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class JwtUtils {
+
+    @Value("${jwt.secret}")
+    private String secret;
+    private Utente utente;
 
     public static String getNameFromToken(String token) {
         try{
@@ -26,6 +36,14 @@ public class JwtUtils {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public String generateToken(Utente utente) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.create()
+                .withSubject(utente.getFirstName()) // Usa il Name come 'sub'
+                .withClaim("preferred_username", utente.getEmail())
+                .sign(algorithm);
     }
 
 

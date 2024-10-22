@@ -3,13 +3,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.keycloak.representations.idm.UserRepresentation;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class UtenteKeycloak {
+public class UtenteKeycloak extends UserRepresentation {
     private String firstName;
     private String lastName;
     private String username;
