@@ -14,12 +14,11 @@ import java.util.Optional;
 public class UtenteService {
 
     private final UtenteRepository utenteRepository;
-    private final JwtUtils jwtUtil;
+
 
     @Autowired
-    public UtenteService(UtenteRepository utenteRepository, JwtUtils jwtUtil) {
+    public UtenteService(UtenteRepository utenteRepository) {
         this.utenteRepository = utenteRepository;
-        this.jwtUtil = jwtUtil;
     }
 
     public List<Utente> getAllUtenti() {

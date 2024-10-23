@@ -11,11 +11,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 @NoArgsConstructor
 
 public class UtenteKeycloak extends UserRepresentation {
-    private String firstName;
-    private String lastName;
     private String username;
     private String email;
-    private String password;
 }
 
 

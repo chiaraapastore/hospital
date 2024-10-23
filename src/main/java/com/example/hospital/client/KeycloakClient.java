@@ -1,6 +1,7 @@
 package com.example.hospital.client;
 
 import com.example.hospital.entity.TokenRequest;
+import org.springframework.util.MultiValueMap;
 import com.example.hospital.entity.UtenteKeycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,8 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@FeignClient(name = "KeycloakClient", url = "${keycloak.auth-server-url}")
+@FeignClient(name = "UtenteController", url = "${keycloak.auth-server-url}")
 public interface KeycloakClient {
 
         @RequestMapping(method = RequestMethod.POST,
@@ -23,8 +25,6 @@ public interface KeycloakClient {
                 produces = "application/json")
         ResponseEntity<Object> createUsers(@RequestHeader("Authorization") String accessToken, @RequestBody UtenteKeycloak utenteKeycloak);
 
-
-        //Ruoli
         @RequestMapping(method = RequestMethod.GET,
                 value = "/admin/realms/${keycloak.realm}/ui-ext/available-roles/users/{id}",
                 produces = "application/json")
@@ -34,6 +34,8 @@ public interface KeycloakClient {
                 value ="/admin/realms/${keycloak.realm}/users/{id}/role-mappings/clients/{clientIdRole}",
                 produces = "application/json")
         ResponseEntity<Object> addRoleToUser(@RequestHeader("Authorization") String accessToken, @PathVariable String id, @PathVariable String clientIdRole, @RequestBody List<RoleRepresentation> roles);
+
+
 }
 
 

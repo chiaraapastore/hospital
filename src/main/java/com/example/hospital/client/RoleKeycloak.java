@@ -12,14 +12,14 @@ public class RoleKeycloak {
     private String id;
     private String role;
     private String client;
-    private String client_id;
-    private String description_role;
+    private String clientId;
+    private String description;
 
     public RoleRepresentation toRoleRepresentation(){
         RoleRepresentation roleRepresentation = new RoleRepresentation();
         roleRepresentation.setId(this.id);
         roleRepresentation.setName(this.role);
-        roleRepresentation.setDescription(this.description_role);
+        roleRepresentation.setDescription(this.description);
         return roleRepresentation;
     }
 }

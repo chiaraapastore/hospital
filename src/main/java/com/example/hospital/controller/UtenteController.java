@@ -1,6 +1,5 @@
 package com.example.hospital.controller;
 
-import com.example.hospital.client.KeycloakClient;
 import com.example.hospital.entity.TokenRequest;
 import com.example.hospital.service.KeycloakService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,11 @@ public class UtenteController {
     private UtenteService utenteService;
     @Autowired
     private KeycloakService keycloakService;
+
     @Autowired
-    private KeycloakClient keycloakClient;
+    public UtenteController(KeycloakService keycloakService) {
+        this.keycloakService = keycloakService;
+    }
 
 
     @GetMapping
@@ -43,23 +45,12 @@ public class UtenteController {
     @PostMapping("/create/users/keycloak")
     public ResponseEntity<Object> createUtenteKeycloak(@RequestBody Utente utente) {
         try {
-            keycloakService.createUtenteInKeycloak(utente);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Utente creato con successo");
+            Utente savedUtente = keycloakService.createUtenteInKeycloak(utente);
+            return ResponseEntity.ok(savedUtente);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nella creazione dell'utente");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-    @PostMapping("/create/users/mongo")
-    public ResponseEntity<Object> createUtenteMongo(@RequestBody Utente utente) {
-        try {
-            utenteService.createUtente(utente);  // Salva l'utente
-            return ResponseEntity.status(HttpStatus.CREATED).body("Utente creato con successo usando MongoDB");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nella creazione dell'utente con MongoDB");
-        }
-    }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Utente> updateUtente(@PathVariable String id, @RequestBody Utente utenteDetails) {
@@ -79,11 +70,17 @@ public class UtenteController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/login")
-    public String login(@RequestBody TokenRequest loginRequest) {
-        return keycloakService.login(loginRequest.getUsername(), loginRequest.getPassword(), loginRequest.getClient_id(), loginRequest.getClient_secret());
 
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody TokenRequest loginRequest) {
+        try {
+            String token = keycloakService.login(loginRequest.getUsername(), loginRequest.getPassword(), loginRequest.getClient_id(), loginRequest.getClient_secret());
+            return ResponseEntity.ok(token);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed: " + e.getMessage());
+        }
     }
+
 
 }
 

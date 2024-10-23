@@ -6,10 +6,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.hospital.entity.Utente;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 
-@Component
+
 public class JwtUtils {
 
     @Value("${jwt.secret}")
