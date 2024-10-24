@@ -1,39 +1,37 @@
 package com.example.hospital.controller;
 
+import com.example.hospital.entity.LoginRequest;
 import com.example.hospital.entity.TokenRequest;
+import com.example.hospital.entity.Utente;
 import com.example.hospital.service.KeycloakService;
+import com.example.hospital.service.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.example.hospital.entity.Utente;
-import com.example.hospital.service.UtenteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class UtenteController {
 
-    @Autowired
-    private UtenteService utenteService;
-    @Autowired
-    private KeycloakService keycloakService;
+    private final UtenteService utenteService;
+    private final KeycloakService keycloakService;
 
     @Autowired
-    public UtenteController(KeycloakService keycloakService) {
+    public UtenteController(UtenteService utenteService, KeycloakService keycloakService) {
+        this.utenteService = utenteService;
         this.keycloakService = keycloakService;
     }
 
-
-    @GetMapping
+    @GetMapping("/utenti")
     public List<Utente> getAllUtenti() {
         return utenteService.getAllUtenti();
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/utenti/{email}")
     public ResponseEntity<Utente> getUtenteByEmail(@PathVariable String email) {
         Utente utente = utenteService.getUtenteByEmail(email);
         if (utente == null) {
@@ -52,7 +50,7 @@ public class UtenteController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/utenti/{id}")
     public ResponseEntity<Utente> updateUtente(@PathVariable String id, @RequestBody Utente utenteDetails) {
         Utente updatedUtente = utenteService.updateUtente(id, utenteDetails);
         if (updatedUtente == null) {
@@ -61,7 +59,7 @@ public class UtenteController {
         return ResponseEntity.ok(updatedUtente);
     }
 
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/utenti/{email}")
     public ResponseEntity<Void> deleteUtente(@PathVariable String email) {
         boolean isDeleted = utenteService.deleteUtente(email);
         if (!isDeleted) {
@@ -70,17 +68,10 @@ public class UtenteController {
         return ResponseEntity.noContent().build();
     }
 
-
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody TokenRequest loginRequest) {
-        try {
-            String token = keycloakService.login(loginRequest.getUsername(), loginRequest.getPassword(), loginRequest.getClient_id(), loginRequest.getClient_secret());
-            return ResponseEntity.ok(token);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed: " + e.getMessage());
-        }
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        return keycloakService.login(loginRequest);
     }
-
 
 }
 

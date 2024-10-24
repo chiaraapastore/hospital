@@ -29,9 +29,6 @@ public class UtenteService {
         return utenteRepository.findByEmail(email);
     }
 
-    public Utente createUtente(Utente utente) {
-        return utenteRepository.save(utente); // Salva l'utente su MongoDB
-    }
 
     public Utente updateUtente(String id, Utente utenteDetails) {
         Optional<Utente> optionalUtente = utenteRepository.findById(id);

@@ -1,6 +1,5 @@
 package com.example.hospital.config;
 
-import com.example.hospital.config.KeycloakJwtTokenConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -22,8 +21,9 @@ public class SecurityConfig {
 
     private final KeycloakJwtTokenConverter keycloakJwtTokenConverter;
 
-    public SecurityConfig(KeycloakJwtTokenConverter keycloakJwtTokenConverter) {
-        this.keycloakJwtTokenConverter = keycloakJwtTokenConverter;
+    public SecurityConfig(TokenConverterPropierties keycloakJwtTokenConverter) {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        this.keycloakJwtTokenConverter = new KeycloakJwtTokenConverter(jwtGrantedAuthoritiesConverter, keycloakJwtTokenConverter);
     }
 
     @Bean

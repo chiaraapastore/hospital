@@ -1,4 +1,5 @@
 package com.example.hospital.entity;
+import com.ibm.asyncutil.iteration.AsyncIterator;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,5 +26,5 @@ public class Utente {
     private String email;
     private String password;
     private String role;
-
+    private boolean enabled;
 }

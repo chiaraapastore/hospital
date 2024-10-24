@@ -2,7 +2,8 @@ package com.example.hospital.service;
 
 import com.example.hospital.client.KeycloakClient;
 import com.example.hospital.client.RoleKeycloak;
-import com.example.hospital.entity.TokenRequest;
+import com.example.hospital.entity.LoginRequest;
+import com.example.hospital.entity.TokenResponse;
 import com.example.hospital.entity.Utente;
 import com.example.hospital.entity.UtenteKeycloak;
 import com.example.hospital.repository.UtenteRepository;
@@ -13,35 +14,30 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class KeycloakService {
 
-    private final KeycloakClient keycloakClient;
-
     @Autowired
+    private final KeycloakClient keycloakClient;
     private UtenteRepository utenteRepository;
 
     @Value("${keycloak.realm}")
     private String realm;
-
-    @Value("${keycloak.resource}")
-    private String clientId;
-
-    @Value("${keycloak.credentials.secret}")
-    private String clientSecret;
-
-    @Value("${keycloak.auth-server-url}")
-    private String authServerUrl;
 
     @Value("${keycloak.admin.username}")
     private String adminUsername;
@@ -49,21 +45,70 @@ public class KeycloakService {
     @Value("${keycloak.admin.password}")
     private String adminPassword;
 
-    public String login(String username, String password, String clientId, String clientSecret) {
-        Map<String, String> map = new HashMap<>();
-        map.put("grant_type", "password");
-        map.put("username", username);
-        map.put("password", password);
-        map.put("client_id", clientId);
-        map.put("client_secret", clientSecret);
+    @Value("${keycloak.auth-server-url}")
+    private String urlKeycloak;
 
-        // Richiesta del token
-        TokenRequest tokenRequest = new TokenRequest(username, password, clientId, clientSecret, "password");
-        ResponseEntity<Object> responseEntity = keycloakClient.getAccessToken(tokenRequest);
-        ObjectMapper objectMapper = new ObjectMapper();
+    @Value("${keycloak.admin.access}")
+    private String clientId;
 
-        Map mapResponse = objectMapper.convertValue(responseEntity.getBody(), Map.class);
-        return mapResponse.get("access_token").toString();
+    @Value("${keycloak.admin.access.secret}")
+    private String clientSecret;
+
+    public ResponseEntity<String> login(LoginRequest loginRequest) {
+        if (!loginRequest.getClientId().equals("nome_del_tuo_client")) {
+            throw new RuntimeException("Client non autorizzato.");
+        }
+
+        try {
+            String tokenEndpoint = urlKeycloak + "/realms/" + realm + "/protocol/openid-connect/token";
+
+            Map<String, String> body = new HashMap<>();
+            body.put("client_id", loginRequest.getClientId());
+            body.put("username", loginRequest.getUsername());
+            body.put("password", loginRequest.getPassword());
+            body.put("grant_type", "password");
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(tokenEndpoint, request, String.class);
+
+            List<LoginRequest> loginRequests = getAllLoginRequests(); // Presupponiamo che ci sia un metodo che restituisce tutte le richieste di login
+            List<LoginRequest> filteredLoginRequests = filterLoginRequestsByClientId(loginRequests, loginRequest.getClientId());
+
+            List<TokenResponse> tokens = getAllTokens(); // Presupponiamo che ci sia un metodo che restituisce tutti i token
+            List<String> filteredTokens = filterTokensByClientId(tokens, loginRequest.getClientId());
+
+            filteredLoginRequests.forEach(lr -> System.out.println("Filtrato LoginRequest: " + lr.getUsername()));
+            filteredTokens.forEach(token -> System.out.println("Filtrato Token: " + token));
+
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("Login failed: " + e.getMessage());
+        }
+    }
+
+    public List<LoginRequest> filterLoginRequestsByClientId(List<LoginRequest> loginRequests, String clientId) {
+        return loginRequests.stream()
+                .filter(loginRequest -> loginRequest.getClientId().equals(clientId))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> filterTokensByClientId(List<TokenResponse> tokens, String clientId) {
+        return tokens.stream()
+                .filter(token -> token.getClientId().equals(clientId))
+                .map(TokenResponse::getToken)
+                .collect(Collectors.toList());
+    }
+
+    private List<LoginRequest> getAllLoginRequests() {
+        return new ArrayList<>();
+    }
+
+    private List<TokenResponse> getAllTokens() {
+        return new ArrayList<>();
     }
 
     // Metodo per creare UtenteKeycloak
@@ -81,18 +126,21 @@ public class KeycloakService {
 
         // Set credenziali
         keycloak.setCredentials(List.of(credentialRepresentation));
-        keycloak.setEnabled(true); // Utente attivo
+        keycloak.setEnabled(false); // Impostato a false per scelta dell'amministratore
         return keycloak;
     }
 
-    // Uso del metodo login per recuperare il token di accesso per l'admin
-    public String getAdminToken() {
-        return login(adminUsername, adminPassword, clientId, clientSecret);
+    public ResponseEntity<Map<String, Object>> getAdminToken() {
+        try {
+            return login(adminUsername, adminPassword,clientId, clientSecret);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Creazione dell'utente in Keycloak
     public Utente createUtenteInKeycloak(Utente utente) throws FeignException {
-        String accessToken = getAdminToken();
+        String accessToken = getAdminToken().toString();
         String authorizationHeader = "Bearer " + accessToken;
         UtenteKeycloak utenteKeycloak = utenteKeycloak(utente);
 
@@ -114,12 +162,11 @@ public class KeycloakService {
         // Assegnazione dei ruoli all'utente
         assignRolesToUser(authorizationHeader, userId, utente.getRole());
 
-
         return savedUtente;
     }
 
-
     private void assignRolesToUser(String authorizationHeader, String userId, String role) {
+        // Filtraggio per ottenere clientId e clientSecret specifici
         String clientId = "hospital-app";
         try {
             ResponseEntity<List<RoleKeycloak>> rolesResponse = keycloakClient.getAvailableRoles(
@@ -168,5 +215,5 @@ public class KeycloakService {
             throw new RuntimeException("Errore generale durante l'assegnazione dei ruoli: " + e.getMessage(), e);
         }
     }
-
 }
+
