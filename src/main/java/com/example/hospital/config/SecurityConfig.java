@@ -29,10 +29,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        http
-                .authorizeHttpRequests(
-                        (authorize) -> authorize.anyRequest().permitAll()
-                )
+        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
                 .csrf((csrf) -> csrf.disable())
                 .cors((cors) -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
@@ -42,9 +39,7 @@ public class SecurityConfig {
                     return config;
                 }))
                 .httpBasic(Customizer.withDefaults())
-                .oauth2ResourceServer((OAuth2) -> OAuth2.jwt(jwtConfigurer ->
-                        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ))
+                .oauth2ResourceServer((OAuth2) -> OAuth2.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())

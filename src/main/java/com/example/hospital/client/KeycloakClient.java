@@ -18,7 +18,7 @@ public interface KeycloakClient {
         @RequestMapping(method = RequestMethod.POST,
                 value = "/realms/${keycloak.realm}/protocol/openid-connect/token",
                 consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        ResponseEntity<Object> getAccessToken(TokenRequest tokenRequest);
+        ResponseEntity<Object> getAccessToken(@RequestBody TokenRequest tokenRequest);
 
         @RequestMapping(method = RequestMethod.POST,
                 value = "/admin/realms/${keycloak.realm}/users",

@@ -69,8 +69,9 @@ public class UtenteController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        return keycloakService.login(loginRequest);
+    public ResponseEntity<String> loginUser(@RequestBody TokenRequest tokenRequest) {
+        String token = keycloakService.login(tokenRequest.getUsername(), tokenRequest.getPassword());
+        return ResponseEntity.ok(token);
     }
 
 }
