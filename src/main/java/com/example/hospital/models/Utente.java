@@ -28,5 +28,7 @@ public class Utente {
     private String lastName;
     @NotBlank(message = "Email obbligatoria")
     private String email;
+    private String role;
+    private String password;
     private boolean enabled;
 }
