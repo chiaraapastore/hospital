@@ -1,4 +1,4 @@
-package com.example.hospital.entity;
+package com.example.hospital.models;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

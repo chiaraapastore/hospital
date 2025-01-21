@@ -2,7 +2,7 @@ package com.example.hospital.service;
 
 import com.example.hospital.client.KeycloakClient;
 import com.example.hospital.client.RoleKeycloak;
-import com.example.hospital.entity.*;
+import com.example.hospital.models.*;
 import com.example.hospital.repository.UtenteRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

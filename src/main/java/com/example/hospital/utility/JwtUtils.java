@@ -4,7 +4,7 @@ package com.example.hospital.utility;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.hospital.entity.Utente;
+import com.example.hospital.models.Utente;
 import org.springframework.beans.factory.annotation.Value;
 
 

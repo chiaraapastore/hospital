@@ -1,8 +1,7 @@
 package com.example.hospital.client;
 
-import com.example.hospital.entity.TokenRequest;
-import org.springframework.util.MultiValueMap;
-import com.example.hospital.entity.UtenteKeycloak;
+import com.example.hospital.models.TokenRequest;
+import com.example.hospital.models.UtenteKeycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

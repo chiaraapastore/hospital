@@ -1,10 +1,8 @@
 package com.example.hospital.service;
 
-import com.example.hospital.entity.Utente;
-import com.example.hospital.utility.JwtUtils;
+import com.example.hospital.models.Utente;
 import com.example.hospital.repository.UtenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

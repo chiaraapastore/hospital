@@ -1,8 +1,8 @@
-package com.example.hospital.entity;
-import com.ibm.asyncutil.iteration.AsyncIterator;
+package com.example.hospital.models;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +20,13 @@ public class Utente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
+    @NotBlank(message = "Username obbligatorio")
     private String username;
+    @NotBlank(message = "Il nome è obbligatorio")
     private String firstName;
+    @NotBlank(message = "Il cognome è obbligatorio")
     private String lastName;
+    @NotBlank(message = "Email obbligatoria")
     private String email;
-    private String password;
-    private String role;
     private boolean enabled;
 }

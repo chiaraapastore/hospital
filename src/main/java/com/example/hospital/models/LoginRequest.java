@@ -1,4 +1,4 @@
-package com.example.hospital.entity;
+package com.example.hospital.models;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

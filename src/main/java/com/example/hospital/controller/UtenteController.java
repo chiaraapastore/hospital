@@ -1,8 +1,7 @@
 package com.example.hospital.controller;
 
-import com.example.hospital.entity.LoginRequest;
-import com.example.hospital.entity.TokenRequest;
-import com.example.hospital.entity.Utente;
+import com.example.hospital.models.TokenRequest;
+import com.example.hospital.models.Utente;
 import com.example.hospital.service.KeycloakService;
 import com.example.hospital.service.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
