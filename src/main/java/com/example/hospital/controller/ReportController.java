@@ -15,21 +15,32 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @GetMapping("/?tipo=<tipo>&inizio=<inizio>&fine=<fine>")
-    public ResponseEntity<List<Report>> generateReports(
-            @RequestParam("tipo") String tipo,
-            @RequestParam("inizio") String inizio,
-            @RequestParam("fine") String fine) {
-        return ResponseEntity.ok(reportService.generateReportsByQuery(tipo, inizio, fine));
+    @GetMapping("/{id}")
+    public ResponseEntity<Report> getReportById(@PathVariable String id) {
+        return reportService.getReportById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Report> generateReport(@RequestBody Report report) {
-        return ResponseEntity.ok(reportService.saveReport(report));
+    public Report createReport(@RequestBody Report report) {
+        return reportService.createReport(report);
     }
 
-    @GetMapping("/listaReports")
-    public ResponseEntity<List<Report>> getAllReports() {
-        return ResponseEntity.ok(reportService.getAllReports());
+    @PutMapping("/update")
+    public ResponseEntity<Report> updateReport(@PathVariable String id, @RequestBody Report updatedReport) {
+        try {
+            return ResponseEntity.ok(reportService.updateReport(id, updatedReport));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
+
+    @GetMapping("/list")
+    public List<Report> getAllReports() {
+        return reportService.getAllReports();
+    }
+
+
+
 }

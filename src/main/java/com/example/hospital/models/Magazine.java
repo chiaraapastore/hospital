@@ -20,6 +20,14 @@ public class Magazine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
+    private List<Medicinale> referenze;
+    private String utenteId;
 
-    private List<Reference> referenze;
+    public String getUtenteId() {
+        return utenteId;
+    }
+
+    public void setUtenteId(String id) {
+        this.utenteId = id;
+    }
 }

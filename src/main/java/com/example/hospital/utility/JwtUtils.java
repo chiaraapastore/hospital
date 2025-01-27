@@ -16,22 +16,20 @@ public class JwtUtils {
     private Utente utente;
 
     public static String getNameFromToken(String token) {
-        try{
+        try {
             DecodedJWT decodedJWT = JWT.decode(token);
-            String username = decodedJWT.getClaim("preferred_username").asString();
-            return username;
-        }catch(Exception e) {
+            return decodedJWT.getClaim("preferred_username").asString();
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
     }
 
     public static String getIdFromToken(String token) {
-        try{
+        try {
             DecodedJWT decodedJWT = JWT.decode(token);
-            String id = decodedJWT.getClaim("sub").asString();
-            return id;
-        }catch(Exception e){
+            return decodedJWT.getClaim("sub").asString();
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
@@ -40,7 +38,7 @@ public class JwtUtils {
     public String generateToken(Utente utente) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         return JWT.create()
-                .withSubject(utente.getFirstName()) // Usa il Name come 'sub'
+                .withSubject(utente.getFirstName())
                 .withClaim("preferred_username", utente.getEmail())
                 .sign(algorithm);
     }

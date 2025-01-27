@@ -16,7 +16,8 @@ public class Department {
     @Id
     private String id;
     private String nome;
-    private HeadOfDepartmentDTO capoReparto;
-    private List<Reference> scorte;
+    private Utente capoReparto;
+    private List<Medicinale> scorte;
+    private List<Utente> utenti;
 
 }

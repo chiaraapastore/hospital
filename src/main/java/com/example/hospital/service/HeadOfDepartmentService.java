@@ -1,37 +1,63 @@
 package com.example.hospital.service;
 
+import com.example.hospital.config.AuthenticationService;
 import com.example.hospital.models.Department;
-import com.example.hospital.models.Reference;
+import com.example.hospital.models.Medicinale;
+import com.example.hospital.models.Utente;
 import com.example.hospital.repository.DepartmentRepository;
+import com.example.hospital.repository.UtenteRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
+@Service
+
 public class HeadOfDepartmentService {
     private DepartmentRepository departmentRepository;
-    public HeadOfDepartmentService(DepartmentRepository departmentRepository) {
+    private final AuthenticationService authenticationService;
+    private final UtenteRepository utenteRepository;
+
+    public HeadOfDepartmentService(DepartmentRepository departmentRepository, UtenteRepository utenteRepository, AuthenticationService authenticationService) {
         this.departmentRepository = departmentRepository;
+        this.authenticationService = authenticationService;
+        this.utenteRepository = utenteRepository;
     }
-    public String aggiornaScorteReparto(String repartoId, String referenzaId, int nuovaQuantita) {
+
+    public String aggiornaScorteReparto(String repartoId, String medicinaleId, int nuovaQuantita) {
+        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (utente == null) {
+            throw new IllegalArgumentException("Utente non trovato");
+        }
+
         Optional<Department> repartoOpt = departmentRepository.findById(repartoId);
         if (repartoOpt.isPresent()) {
             Department reparto = repartoOpt.get();
-            List<Reference> scorte = reparto.getScorte();
+            List<Medicinale> scorte = reparto.getScorte();
 
-            Optional<Reference> referenzaOpt = scorte.stream()
-                    .filter(r -> r.getId().equals(referenzaId))
+            Optional<Medicinale> medicinaleOpt = scorte.stream()
+                    .filter(r -> r.getId().equals(medicinaleId))
                     .findFirst();
 
-            if (referenzaOpt.isPresent()) {
-                Reference referenza = referenzaOpt.get();
-                referenza.setQuantita(nuovaQuantita);
+            if (medicinaleOpt.isPresent()) {
+                Medicinale medicinale = medicinaleOpt.get();
+                medicinale.setQuantita(nuovaQuantita);
                 departmentRepository.save(reparto);
-                return "Scorte aggiornate per la referenza " + referenzaId + " nel reparto " + repartoId;
+                return "Scorte aggiornate per la referenza " + medicinaleId + " nel reparto " + repartoId;
             } else {
-                throw new IllegalArgumentException("Referenza con ID " + referenzaId + " non trovata nel reparto " + repartoId);
+                throw new IllegalArgumentException("Referenza con ID " + medicinaleId + " non trovata nel reparto " + repartoId);
             }
         } else {
             throw new IllegalArgumentException("Reparto con ID " + repartoId + " non trovato");
         }
     }
 
+    public String inviaNotifica(String repartoId, String messaggio) {
+        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (utente == null) {
+            throw new IllegalArgumentException("Utente non trovato");
+        }
+
+        return "Notifica inviata al reparto " + repartoId + ": " + messaggio;
+    }
 }

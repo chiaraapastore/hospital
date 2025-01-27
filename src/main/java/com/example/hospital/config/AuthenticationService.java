@@ -8,28 +8,29 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
-public class AuthenticationService { // La classe gestisce la decodifica dei token jwt per estrarre informazioni come username, id utente e ruoli di realm.
-    private final JwtDecoder jwtDecoder; ////Autenticare l'utente
+public class AuthenticationService {
+    private final JwtDecoder jwtDecoder;
 
-    public AuthenticationService(JwtDecoder jwtDecoder) { //Costruttore, responsabile della decodifica del token jwt
+    public AuthenticationService(JwtDecoder jwtDecoder) {
         this.jwtDecoder = jwtDecoder;
     }
-    // Metodo per ottenere l'username dal token JWT, per estrapolare username-email
+
     public String getUsername() {
         try {
-            //Il token viene recuperato dall'header della richiesta HTTP
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest(); // prendo la sessione corrente
-            String token = request.getHeader("Authorization").split("")[1]; //splittato
-            String result = JwtUtils.getNameFromToken(token);
-            return result;
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Token mancante o malformato");
+            }
+            String token = authorizationHeader.split(" ")[1];
+            return JwtUtils.getNameFromToken(token);
         } catch (Exception e) {
             e.printStackTrace();
             return "guest";
         }
     }
 
-    // Metodo per ottenere l'id utente dal token JWT attraverso i claim
-    // I claim sono informazioni che vengono contenute nel JWT, come dati dell'utente, autorizzazioni, etc.
+
     public String getUserId() {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();

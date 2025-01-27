@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class UserDepartmentDTO extends Utente {
+public class DoctorDTO extends Utente {
         private String repartoId;
 }

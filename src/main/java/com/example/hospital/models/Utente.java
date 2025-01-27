@@ -30,5 +30,6 @@ public class Utente {
     private String email;
     private String role;
     private String password;
-    private boolean enabled;
+    private int countNotification;
+    private String keycloakId;
 }

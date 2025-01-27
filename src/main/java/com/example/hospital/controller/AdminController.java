@@ -8,28 +8,27 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminController {
 
+
     private final AdminService adminService;
 
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
 
-    @PostMapping("/abilita-utente/{userId}")
-    public ResponseEntity<String> abilitaUtente(@PathVariable String userId) {
-        String response = adminService.abilitaUtente(userId);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/disabilita-utente/{userId}")
-    public ResponseEntity<String> disabilitaUtente(@PathVariable String userId) {
-        String response = adminService.disabilitaUtente(userId);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/crea-reparto")
     public ResponseEntity<String> creaReparto(@RequestBody String nomeReparto) {
         String response = adminService.creaReparto(nomeReparto);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/aggiungi-utente-reparto")
+    public String aggiungiUtenteAReparto(@RequestParam String utenteId, @RequestParam String repartoId) {
+        return adminService.aggiungiUtenteAReparto(utenteId, repartoId);
+    }
+
+    @PostMapping("/assegna-capo-reparto")
+    public String assegnaCapoReparto(@RequestParam String utenteId, @RequestParam String repartoId) {
+        return adminService.assegnaCapoReparto(utenteId, repartoId);
     }
 }
 

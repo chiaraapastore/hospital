@@ -1,9 +1,7 @@
 package com.example.hospital.controller;
 
 import com.example.hospital.models.Department;
-import com.example.hospital.models.HeadOfDepartmentDTO;
 import com.example.hospital.service.DepartmentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,8 +32,8 @@ public class DepartmentController {
     @PutMapping("/{departmentId}/assign-head")
     public ResponseEntity<Void> assignHeadOfDepartment(
             @PathVariable String departmentId,
-            @RequestBody Map<String, HeadOfDepartmentDTO> request) {
-        HeadOfDepartmentDTO capoRepartoId = request.get("capoRepartoId");
+            @RequestBody Map<String, String> request) {
+        String capoRepartoId = request.get("capoRepartoId");
         departmentService.assignHeadOfDepartment(departmentId, capoRepartoId);
         return ResponseEntity.ok().build();
     }

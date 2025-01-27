@@ -1,27 +1,24 @@
 package com.example.hospital.models;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 
+
+@Document(value = "somministrazione")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "administrations")
-public class Administration {
-
+public class Somministrazione {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
-
-    private String referenceId;
+    private Medicinale medicinaleId;
     private int quantita;
-    private LocalDateTime dataOra;
     private Utente utenteId;
+    private LocalDateTime dataOra;
+
+
 }

@@ -24,5 +24,11 @@ public class HeadOfDepartmentController {
         String response = headOfDepartmentService.aggiornaScorteReparto(repartoId, referenzaId, nuovaQuantita);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/notifica/{repartoId}")
+    public ResponseEntity<String> inviaNotifica(@PathVariable String repartoId, @RequestBody String messaggio) {
+        String response = headOfDepartmentService.inviaNotifica(repartoId, messaggio);
+        return ResponseEntity.ok(response);
+    }
 }
 

@@ -1,51 +1,70 @@
 package com.example.hospital.service;
 
+import com.example.hospital.config.AuthenticationService;
 import com.example.hospital.models.Utente;
 import com.example.hospital.repository.UtenteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+
+
 
 @Service
 public class UtenteService {
 
     private final UtenteRepository utenteRepository;
+    private final AuthenticationService authenticationService;
 
-
-    @Autowired
-    public UtenteService(UtenteRepository utenteRepository) {
+    public UtenteService(UtenteRepository utenteRepository, AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
         this.utenteRepository = utenteRepository;
     }
 
-    public List<Utente> getAllUtenti() {
-        return utenteRepository.findAll();
-    }
 
     public Utente getUtenteByEmail(String email) {
+        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (utente == null) {
+            throw new IllegalArgumentException("Utente non trovato");
+        }
         return utenteRepository.findByEmail(email);
     }
 
 
     public Utente updateUtente(String id, Utente utenteDetails) {
-        Optional<Utente> optionalUtente = utenteRepository.findById(id);
-        if (optionalUtente.isPresent()) {
-            Utente utente = optionalUtente.get();
-            utente.setFirstName(utenteDetails.getFirstName());
-            return utenteRepository.save(utente);
+        Utente authenticatedUtente = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (authenticatedUtente == null) {
+            throw new IllegalArgumentException("Utente autenticato non trovato");
         }
-        return null;
+        Utente utente = utenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        utente.setFirstName(utenteDetails.getFirstName());
+        utente.setLastName(utenteDetails.getLastName());
+
+        return utenteRepository.save(utente);
     }
 
-    public boolean deleteUtente(String email) {
-        Utente optionalUtente = utenteRepository.findByEmail(email);
-        if (optionalUtente != null) {
-            utenteRepository.deleteByEmail(email);
+    public void deleteUtente(String email) {
+        Utente utenteToDelete = utenteRepository.findByEmail(email);
+        if (utenteToDelete == null) {
+            throw new IllegalArgumentException("Utente non trovato");
+        }
+        utenteRepository.delete(utenteToDelete);
+    }
+
+
+    public boolean userExistsByUsername(String username) {
+        Utente user = utenteRepository.findByUsername(username);
+        if (user != null) {
             return true;
+        }else{
+            return false;
         }
-        return false;
     }
 
+
+    public Utente getUserDetailsDataBase() {
+        String username = authenticationService.getUsername();
+        return utenteRepository.findByUsername(username);
+    }
 }
 

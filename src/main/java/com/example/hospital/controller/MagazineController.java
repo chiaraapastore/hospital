@@ -15,12 +15,13 @@ public class MagazineController {
 
     @GetMapping("/stock")
     public ResponseEntity<Magazine> getStock() {
-        return ResponseEntity.ok(magazineService.getStock());
+        return ResponseEntity.ok(magazineService.getUserStock());
     }
 
     @PutMapping("/update")
     public ResponseEntity<Void> updateStock(@RequestBody Magazine magazine) {
-        magazineService.updateStock(magazine);
+        magazineService.updateUserStock(magazine);
         return ResponseEntity.ok().build();
     }
+
 }

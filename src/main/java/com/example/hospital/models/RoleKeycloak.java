@@ -1,4 +1,4 @@
-package com.example.hospital.client;
+package com.example.hospital.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +8,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class RoleKeycloak {
     private String id;
     private String role;

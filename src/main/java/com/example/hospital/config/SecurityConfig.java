@@ -21,7 +21,7 @@ public class SecurityConfig {
 
     private final KeycloakJwtTokenConverter keycloakJwtTokenConverter;
 
-    public SecurityConfig(TokenConverterPropierties keycloakJwtTokenConverter) {
+    public SecurityConfig(TokenConverterProperties keycloakJwtTokenConverter) {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         this.keycloakJwtTokenConverter = new KeycloakJwtTokenConverter(jwtGrantedAuthoritiesConverter, keycloakJwtTokenConverter);
     }
@@ -51,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        // Remove the SCOPE_ prefix
+
         grantedAuthoritiesConverter.setAuthorityPrefix("");
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(keycloakJwtTokenConverter);
