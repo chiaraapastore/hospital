@@ -43,13 +43,15 @@ public class UtenteService {
         return utenteRepository.save(utente);
     }
 
-    public void deleteUtente(String email) {
-        Utente utenteToDelete = utenteRepository.findByEmail(email);
-        if (utenteToDelete == null) {
-            throw new IllegalArgumentException("Utente non trovato");
+    public boolean deleteUtente(String username) {
+        Utente userToDelete = utenteRepository.findByUsername(username);
+        if (userToDelete != null) {
+            utenteRepository.delete(userToDelete);
+            return true;
         }
-        utenteRepository.delete(utenteToDelete);
+        return false;
     }
+
 
 
     public boolean userExistsByUsername(String username) {

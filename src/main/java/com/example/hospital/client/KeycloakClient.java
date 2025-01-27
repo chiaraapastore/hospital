@@ -29,10 +29,15 @@ public interface KeycloakClient {
                 produces = "application/json")
         ResponseEntity<List<RoleKeycloak>> getAvailableRoles(@RequestHeader("Authorization") String accessToken, @PathVariable("id") String id, @RequestParam(value = "first", defaultValue = "0") String first, @RequestParam(value = "max", defaultValue = "100") String max, @RequestParam(value = "search", defaultValue = "") String search);
 
+
         @RequestMapping(method = RequestMethod.POST,
                 value = "/admin/realms/${keycloak.admin.realm}/users/{id}/role-mappings/clients/{clientIdRole}",
                 produces = "application/json")
-        ResponseEntity<Object> addRoleToUser(@RequestHeader("Authorization") String accessToken, @PathVariable String id, @PathVariable String clientIdRole, @RequestBody List<RoleRepresentation> roles);
+        ResponseEntity<Object> addRoleToUser(
+                @RequestHeader("Authorization") String accessToken,
+                @PathVariable String id,
+                @PathVariable String clientIdRole,
+                @RequestBody List<RoleRepresentation> roles);
 
 }
 

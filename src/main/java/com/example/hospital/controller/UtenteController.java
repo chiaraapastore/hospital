@@ -71,15 +71,13 @@ public class UtenteController {
         return ResponseEntity.ok(updatedUtente);
     }
 
-    @DeleteMapping("/users/{email}")
-    public ResponseEntity<Void> deleteUtente(@PathVariable String email) {
-        try {
-            utenteService.deleteUtente(email);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @DeleteMapping("/users/{username}")
+    public ResponseEntity<Void> deleteUtente(@PathVariable String username) {
+        boolean isDeleted = utenteService.deleteUtente(username);
+        return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
+
 
 
     @GetMapping("/userDetailsDataBase")

@@ -1,7 +1,6 @@
 package com.example.hospital.service;
 
 import com.example.hospital.client.KeycloakClient;
-import com.example.hospital.models.RoleKeycloak;
 import com.example.hospital.models.*;
 import com.example.hospital.repository.DepartmentRepository;
 import com.example.hospital.repository.UtenteRepository;
@@ -15,7 +14,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -71,11 +70,37 @@ public class KeycloakService {
         utente.setId(userId);
         Utente savedUtente = utenteRepository.save(utente);
 
+
+//        ResponseEntity<List<RoleKeycloak>> rolesResponse = keycloakClient.getAvailableRoles(
+//                authorizationHeader, userId, "0", "100", "");
+//
+//        if (rolesResponse == null || !rolesResponse.getStatusCode().is2xxSuccessful() || rolesResponse.getBody() == null) {
+//            throw new RuntimeException("Errore durante il recupero dei ruoli disponibili da Keycloak");
+//        }
+//
+//        RoleKeycloak capoRepartoRole = rolesResponse.getBody().stream()
+//                .filter(role -> "capo_reparto".equals(role.getName()))
+//                .findFirst()
+//                .orElseThrow(() -> new RuntimeException("Ruolo 'capo_reparto' non trovato nei ruoli disponibili"));
+//
+//
+//        String clientIdRole = capoRepartoRole.getClientId();
+//        List<RoleRepresentation> rolesToAssign = List.of(
+//                new RoleRepresentation(capoRepartoRole.getName(), capoRepartoRole.getDescription(), false)
+//        );
+//
+//        ResponseEntity<Object> roleResponse = keycloakClient.addRoleToUser(
+//                authorizationHeader, userId, clientIdRole, rolesToAssign);
+//
+//        if (roleResponse == null || !roleResponse.getStatusCode().is2xxSuccessful()) {
+//            throw new RuntimeException("Errore durante l'assegnazione del ruolo su Keycloak: " +
+//                    (roleResponse != null ? roleResponse.getBody() : "Nessuna risposta dal server."));
+//        }
+//
+//        utente.setRole("capo_reparto");
+
         return savedUtente;
     }
-
-
-    //Todo assegnare il ruolo capo reparto sia su keycloak che su db mediante addroletouser
 
 
     private UtenteKeycloak utenteKeycloak(Utente utente) {

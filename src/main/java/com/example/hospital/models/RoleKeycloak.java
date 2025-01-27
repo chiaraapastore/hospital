@@ -15,6 +15,7 @@ public class RoleKeycloak {
     private String client;
     private String clientId;
     private String description;
+    private String name;
 
     public RoleRepresentation toRoleRepresentation(){
         RoleRepresentation roleRepresentation = new RoleRepresentation();
@@ -22,5 +23,9 @@ public class RoleKeycloak {
         roleRepresentation.setName(this.role);
         roleRepresentation.setDescription(this.description);
         return roleRepresentation;
+    }
+
+    public void setName(String capoReparto) {
+        this.name = capoReparto;
     }
 }
