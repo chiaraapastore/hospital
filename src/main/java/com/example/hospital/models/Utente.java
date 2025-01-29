@@ -1,24 +1,21 @@
 package com.example.hospital.models;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Setter
 @Getter
-@Document(value ="utenti")
 @AllArgsConstructor
 @NoArgsConstructor
 
+@Document(value ="utenti")
 public class Utente {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     @NotBlank(message = "Username obbligatorio")
     private String username;

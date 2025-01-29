@@ -20,7 +20,7 @@ public class Magazine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
-    private List<Medicinale> referenze;
+    private List<Medicinale> medicinali;
     private String utenteId;
 
     public String getUtenteId() {

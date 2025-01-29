@@ -68,42 +68,41 @@ public class KeycloakService {
         String[] locationParts = location.split("/");
         String userId = locationParts[locationParts.length - 1];
         utente.setId(userId);
+        addRole(authorizationHeader,userId,"capo-reparto");
         Utente savedUtente = utenteRepository.save(utente);
-
-
-//        ResponseEntity<List<RoleKeycloak>> rolesResponse = keycloakClient.getAvailableRoles(
-//                authorizationHeader, userId, "0", "100", "");
-//
-//        if (rolesResponse == null || !rolesResponse.getStatusCode().is2xxSuccessful() || rolesResponse.getBody() == null) {
-//            throw new RuntimeException("Errore durante il recupero dei ruoli disponibili da Keycloak");
-//        }
-//
-//        RoleKeycloak capoRepartoRole = rolesResponse.getBody().stream()
-//                .filter(role -> "capo_reparto".equals(role.getName()))
-//                .findFirst()
-//                .orElseThrow(() -> new RuntimeException("Ruolo 'capo_reparto' non trovato nei ruoli disponibili"));
-//
-//
-//        String clientIdRole = capoRepartoRole.getClientId();
-//        List<RoleRepresentation> rolesToAssign = List.of(
-//                new RoleRepresentation(capoRepartoRole.getName(), capoRepartoRole.getDescription(), false)
-//        );
-//
-//        ResponseEntity<Object> roleResponse = keycloakClient.addRoleToUser(
-//                authorizationHeader, userId, clientIdRole, rolesToAssign);
-//
-//        if (roleResponse == null || !roleResponse.getStatusCode().is2xxSuccessful()) {
-//            throw new RuntimeException("Errore durante l'assegnazione del ruolo su Keycloak: " +
-//                    (roleResponse != null ? roleResponse.getBody() : "Nessuna risposta dal server."));
-//        }
-//
-//        utente.setRole("capo_reparto");
-
         return savedUtente;
     }
 
 
-    private UtenteKeycloak utenteKeycloak(Utente utente) {
+   private void addRole(String authorizationHeader, String userId, String roleName) throws FeignException{
+
+        ResponseEntity<List<RoleKeycloak>> rolesResponse = keycloakClient.getAvailableRoles(authorizationHeader, userId, "0", "100", "");
+
+        if (rolesResponse == null || !rolesResponse.getStatusCode().is2xxSuccessful() || rolesResponse.getBody() == null) {
+            throw new RuntimeException("Errore durante il recupero dei ruoli disponibili da Keycloak");
+        }
+
+        RoleKeycloak capoRepartoRole = rolesResponse.getBody().stream()
+                .filter(role -> "capo-reparto".equals(role.getName()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Ruolo 'capo-reparto' non trovato nei ruoli disponibili"));
+
+
+        String clientIdRole = capoRepartoRole.getClientId();
+        List<RoleRepresentation> rolesToAssign = List.of(
+                new RoleRepresentation(capoRepartoRole.getName(), capoRepartoRole.getDescription(), false)
+        );
+
+        ResponseEntity<Object> roleResponse = keycloakClient.addRoleToUser(authorizationHeader, userId, clientIdRole, rolesToAssign);
+
+        if (roleResponse == null || !roleResponse.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Errore durante l'assegnazione del ruolo su Keycloak: " +
+                    (roleResponse != null ? roleResponse.getBody() : "Nessuna risposta dal server."));
+        }
+   }
+
+
+   private UtenteKeycloak utenteKeycloak(Utente utente) {
         UtenteKeycloak keycloak = new UtenteKeycloak();
         keycloak.setUsername(utente.getUsername());
         keycloak.setFirstName(utente.getFirstName());

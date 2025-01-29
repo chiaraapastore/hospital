@@ -17,6 +17,9 @@ public class Notification {
     private String id;
     private String messaggio;
     private boolean letta;
-    private Utente userId;
+    private String senderId;
+    private String receiverId;
     private LocalDateTime dataOra;
+    private String type;
+    private LocalDateTime readNotification;
 }
