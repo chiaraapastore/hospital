@@ -1,0 +1,62 @@
+package hospitalApplication.controller;
+
+import hospitalApplication.models.Notification;
+import hospitalApplication.models.Utente;
+import hospitalApplication.service.NotificationService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/notifications")
+public class NotificationController {
+
+    private final NotificationService notificationService;
+
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    @PostMapping("/welcome/{userId}")
+    public ResponseEntity<Void> sendWelcomeNotification(@PathVariable Long userId) {
+        Utente user = notificationService.getUserById(userId);
+        notificationService.sendWelcomeNotification(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/new-patient")
+    public ResponseEntity<Void> notifyNewPatient(@RequestParam Long doctorId, @RequestParam Long chiefId, @RequestParam String patientName) {
+        Utente doctor = notificationService.getUserById(doctorId);
+        Utente chief = notificationService.getUserById(chiefId);
+        notificationService.notifyNewPatient(doctor, chief, patientName);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/department-change")
+    public ResponseEntity<Void> notifyDepartmentChange(@RequestParam Long userId, @RequestParam String newDepartmentName, @RequestParam(required = false) Long chiefId) {
+        Utente user = notificationService.getUserById(userId);
+        Utente chief = chiefId != null ? notificationService.getUserById(chiefId) : null;
+        notificationService.notifyDepartmentChange(user, newDepartmentName, chief);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/mark-read/{notificationId}")
+    public ResponseEntity<Void> markNotificationAsRead(@PathVariable Long notificationId) {
+        notificationService.markNotificationAsRead(notificationId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/mark-all-read/{userId}")
+    public ResponseEntity<Void> markAllNotificationsAsReadForUser(@PathVariable Long userId) {
+        Utente user = notificationService.getUserById(userId);
+        notificationService.markAllNotificationsAsReadForUser(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Long userId) {
+        Utente user = notificationService.getUserById(userId);
+        List<Notification> notifications = notificationService.getUserNotifications(user);
+        return ResponseEntity.ok(notifications);
+    }
+}
