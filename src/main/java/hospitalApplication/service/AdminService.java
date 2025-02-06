@@ -76,16 +76,22 @@ public class AdminService {
         Utente authenticatedUser = utenteRepository.findByUsername(authenticatedUsername);
 
         if (authenticatedUser == null) {
-            throw new IllegalArgumentException(" Utente autenticato non trovato nel database: " + authenticatedUsername);
+            throw new IllegalArgumentException("Utente autenticato non trovato nel database: " + authenticatedUsername);
         }
 
         System.out.println("Utente autenticato trovato: " + authenticatedUser.getUsername());
-
         System.out.println("Assegnazione capo reparto per: " + nomeUtente + " al reparto ID: " + repartoId);
 
-        Utente utente = utenteRepository.findByUsername(nomeUtente);
+        String[] parts = nomeUtente.split(" ");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Il nome utente deve contenere almeno nome e cognome");
+        }
+        String firstName = parts[0];
+        String lastName = parts[1];
+
+        Utente utente = utenteRepository.findByFirstNameAndLastName(firstName, lastName);
         if (utente == null) {
-            throw new IllegalArgumentException("Utente con nome " + nomeUtente + " non trovato nel database");
+            throw new IllegalArgumentException("Utente con nome " + firstName + " " + lastName + " non trovato nel database");
         }
 
         Department reparto = departmentRepository.findById(repartoId)
@@ -94,9 +100,9 @@ public class AdminService {
         reparto.setCapoReparto(utente);
         departmentRepository.save(reparto);
 
-        return "Utente " + utente.getFirstName() + " " + utente.getLastName() +
-                " assegnato come capo del reparto " + reparto.getNome();
+        return "Utente " + utente.getFirstName() + " " + utente.getLastName() + " assegnato come capo del reparto " + reparto.getNome();
     }
+
 
 
 
