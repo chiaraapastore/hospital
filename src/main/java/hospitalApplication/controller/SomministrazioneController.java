@@ -2,6 +2,7 @@ package hospitalApplication.controller;
 
 import hospitalApplication.models.Somministrazione;
 import hospitalApplication.service.SomministrazioneService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class SomministrazioneController {
     }
 
     @PostMapping("/registra")
-    public ResponseEntity<Somministrazione> registraSomministrazione(@RequestBody Somministrazione somministrazione) {
+    public ResponseEntity<Somministrazione> registraSomministrazione(@Valid @RequestBody Somministrazione somministrazione) {
         try {
             Somministrazione nuovaSomministrazione = somministrazioneService.registraSomministrazione(somministrazione);
             return ResponseEntity.ok(nuovaSomministrazione);
