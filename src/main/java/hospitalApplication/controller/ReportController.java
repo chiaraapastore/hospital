@@ -23,8 +23,9 @@ public class ReportController {
     }
 
     @PostMapping("/create")
-    public Report createReport(@RequestBody Report report) {
-        return reportService.createReport(report);
+    public ResponseEntity<Report> createReport(@RequestBody Report report) {
+        Report savedReport = reportService.createReport(report);
+        return ResponseEntity.ok(savedReport);
     }
 
     @PutMapping("/update")
