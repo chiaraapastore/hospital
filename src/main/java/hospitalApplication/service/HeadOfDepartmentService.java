@@ -8,6 +8,7 @@ import hospitalApplication.repository.DepartmentRepository;
 import hospitalApplication.repository.MedicinaleRepository;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class HeadOfDepartmentService {
         this.utenteRepository = utenteRepository;
     }
 
+    @Transactional
     public String aggiornaScorteReparto(Long repartoId, Long medicinaleId, int nuovaQuantita) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -43,7 +45,7 @@ public class HeadOfDepartmentService {
         return "Scorte aggiornate per la referenza " + medicinaleId + " nel reparto " + repartoId;
     }
 
-
+    @Transactional
     public String inviaNotifica(String repartoId, String messaggio) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {

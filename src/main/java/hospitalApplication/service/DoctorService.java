@@ -1,7 +1,6 @@
 package hospitalApplication.service;
 
 import hospitalApplication.config.AuthenticationService;
-import hospitalApplication.models.Department;
 import hospitalApplication.models.Medicinale;
 import hospitalApplication.repository.DepartmentRepository;
 import hospitalApplication.repository.MedicinaleRepository;
@@ -10,9 +9,9 @@ import hospitalApplication.repository.UtenteRepository;
 import hospitalApplication.models.Paziente;
 import hospitalApplication.models.Utente;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DoctorService {
@@ -30,6 +29,8 @@ public class DoctorService {
         this.authenticationService = authenticationService;
         this.utenteRepository = utenteRepository;
     }
+
+    @Transactional
     public String visualizzaReferenzeReparto(Long repartoId) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -41,7 +42,7 @@ public class DoctorService {
         return "Referenze disponibili per il reparto con ID " + repartoId + ": " + medicinali;
     }
 
-
+    @Transactional
     public String somministraMedicine(Long pazienteId, Long medicinaleId) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {

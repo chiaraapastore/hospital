@@ -4,8 +4,7 @@ import hospitalApplication.config.AuthenticationService;
 import hospitalApplication.models.Utente;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
-
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -20,6 +19,7 @@ public class UtenteService {
     }
 
 
+    @Transactional
     public Utente getUtenteByEmail(String email) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -29,6 +29,7 @@ public class UtenteService {
     }
 
 
+    @Transactional
     public Utente updateUtente(Long id, Utente utenteDetails) {
         Utente authenticatedUtente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (authenticatedUtente == null) {
@@ -43,6 +44,7 @@ public class UtenteService {
         return utenteRepository.save(utente);
     }
 
+    @Transactional
     public boolean deleteUtente(String username) {
         Utente userToDelete = utenteRepository.findByUsername(username);
         if (userToDelete != null) {
@@ -53,7 +55,7 @@ public class UtenteService {
     }
 
 
-
+    @Transactional
     public boolean userExistsByUsername(String username) {
         Utente user = utenteRepository.findByUsername(username);
         if (user != null) {
@@ -63,7 +65,7 @@ public class UtenteService {
         }
     }
 
-
+    @Transactional
     public Utente getUserDetailsDataBase() {
         String username = authenticationService.getUsername();
         return utenteRepository.findByUsername(username);

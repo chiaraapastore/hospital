@@ -6,6 +6,8 @@ import hospitalApplication.models.Utente;
 import hospitalApplication.repository.NotificationRepository;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class NotificationService {
         this.authenticationService = authenticationService;
     }
 
+    @Transactional
     public void sendWelcomeNotification(Utente newUser) {
         Utente sender = utenteRepository.findByUsername(authenticationService.getUsername());
         if (sender == null) {
@@ -31,6 +34,7 @@ public class NotificationService {
         createAndSendNotification(sender, newUser, message, "welcome");
     }
 
+    @Transactional
     public void notifyNewPatient(Utente doctor, Utente chief, String patientName) {
         Utente sender = utenteRepository.findByUsername(authenticationService.getUsername());
         if (sender == null) {
@@ -41,6 +45,7 @@ public class NotificationService {
         createAndSendNotification(sender, chief, message, "new_patient");
     }
 
+    @Transactional
     public void notifyDepartmentChange(Utente user, String newDepartmentName, Utente chief) {
         Utente sender = utenteRepository.findByUsername(authenticationService.getUsername());
         if (sender == null) {
@@ -70,6 +75,7 @@ public class NotificationService {
         utenteRepository.save(receiver);
     }
 
+    @Transactional
     public void markNotificationAsRead(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notifica non trovata"));
@@ -86,6 +92,7 @@ public class NotificationService {
         }
     }
 
+    @Transactional
     public void markAllNotificationsAsReadForUser(Utente user) {
         List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndLettaFalse(user.getId());
 
@@ -101,10 +108,12 @@ public class NotificationService {
         }
     }
 
+    @Transactional
     public List<Notification> getUserNotifications(Utente user) {
         return notificationRepository.findByReceiverId(user.getId());
     }
 
+    @Transactional
     public Utente getUserById(Long doctorId) {
         return utenteRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Utente con ID " + doctorId + " non trovato"));

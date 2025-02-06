@@ -13,15 +13,20 @@ public class MagazineController {
 
     private final MagazineService magazineService;
 
+    @PostMapping("/create")
+    public ResponseEntity<Magazine> createMagazine(@RequestBody Magazine magazine) {
+        Magazine savedMagazine = magazineService.createMagazine(magazine);
+        return ResponseEntity.ok(savedMagazine);
+    }
+
     @GetMapping("/stock")
     public ResponseEntity<Magazine> getStock() {
-        return ResponseEntity.ok(magazineService.getUserStock());
+        return ResponseEntity.ok(magazineService.getStock());
     }
 
     @PutMapping("/update")
     public ResponseEntity<Void> updateStock(@RequestBody Magazine magazine) {
-        magazineService.updateUserStock(magazine);
+        magazineService.updateStock(magazine);
         return ResponseEntity.ok().build();
     }
-
 }

@@ -2,7 +2,6 @@ package hospitalApplication.service;
 
 import hospitalApplication.config.AuthenticationService;
 import hospitalApplication.models.Department;
-import hospitalApplication.models.Utente;
 import hospitalApplication.repository.DepartmentRepository;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
@@ -32,18 +31,6 @@ public class DepartmentService {
     @Transactional
     public Department createDepartment(Department department) {
         return departmentRepository.save(department);
-    }
-
-    @Transactional
-    public void assignHeadOfDepartment(Long departmentId, Long capoRepartoId) {
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new RuntimeException("Reparto non trovato"));
-
-        Utente capoReparto = utenteRepository.findById(capoRepartoId)
-                .orElseThrow(() -> new RuntimeException("Capo reparto non trovato"));
-
-        department.setCapoReparto(capoReparto);
-        departmentRepository.save(department);
     }
 
     @Transactional

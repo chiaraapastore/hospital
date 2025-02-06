@@ -26,8 +26,6 @@ public class Medicinale {
     private int quantita;
     @Min(0)
     private int availableQuantity;
-    @Min(0)
-    private int scorteDisponibili;
 
 
     @ManyToOne

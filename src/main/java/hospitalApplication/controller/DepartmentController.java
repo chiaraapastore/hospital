@@ -29,15 +29,6 @@ public class DepartmentController {
         return departmentService.createDepartment(department);
     }
 
-    @PutMapping("/{departmentId}/assign-head")
-    public ResponseEntity<Void> assignHeadOfDepartment(
-            @PathVariable Long departmentId,
-            @RequestBody Map<String, String> request) {
-        Long capoRepartoId = Long.parseLong(request.get("headId"));
-        departmentService.assignHeadOfDepartment(departmentId, capoRepartoId);
-        return ResponseEntity.ok().build();
-    }
-
 
     @PutMapping("/update/{id}")
     public Department updateDepartment(@PathVariable Long id, @RequestBody Department department) {

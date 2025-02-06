@@ -6,6 +6,7 @@ import hospitalApplication.models.Utente;
 import hospitalApplication.repository.MedicinaleRepository;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class MedicinaleService {
         this.authenticationService = authenticationService;
     }
 
+    @Transactional
     public Optional<Medicinale> getMedicinaleById(Long id) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -31,6 +33,7 @@ public class MedicinaleService {
         return medicinaleRepository.findById(id);
     }
 
+    @Transactional
     public Medicinale saveMedicinale(Medicinale medicinale) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -39,6 +42,7 @@ public class MedicinaleService {
         return medicinaleRepository.save(medicinale);
     }
 
+    @Transactional
     public Medicinale updateMedicinaleQuantity(Long medicinaleId, int newQuantity) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -74,6 +78,7 @@ public class MedicinaleService {
         return medicinaleRepository.save(medicinale);
     }
 
+    @Transactional
     public void deleteMedicinale(Long id) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -82,14 +87,4 @@ public class MedicinaleService {
         medicinaleRepository.deleteById(id);
     }
 
-    public void verificaRiordino() {
-        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (utente == null) {
-            throw new IllegalArgumentException("Utente non trovato");
-        }
-        List<Medicinale> medicinali = medicinaleRepository.findAll();
-        medicinali.stream()
-                .filter(m -> m.getQuantita() <= m.getPuntoRiordino())
-                .forEach(m -> System.out.println("Notifica: il medicinale " + m.getNome() + " ha raggiunto il livello di riordino."));
-    }
 }

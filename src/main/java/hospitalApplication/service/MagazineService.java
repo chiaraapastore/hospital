@@ -1,56 +1,50 @@
 package hospitalApplication.service;
 
-
-import hospitalApplication.config.AuthenticationService;
 import hospitalApplication.models.Magazine;
 import hospitalApplication.models.Medicinale;
-import hospitalApplication.models.Utente;
 import hospitalApplication.repository.MagazineRepository;
 import hospitalApplication.repository.MedicinaleRepository;
-import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-
 public class MagazineService {
     private final MagazineRepository magazineRepository;
-    private final UtenteRepository utenteRepository;
-    private final AuthenticationService authenticationService;
     private final MedicinaleRepository medicinaleRepository;
 
-    public MagazineService(MagazineRepository magazineRepository,UtenteRepository utenteRepository, AuthenticationService authenticationService, MedicinaleRepository medicinaleRepository) {
+    public MagazineService(MagazineRepository magazineRepository, MedicinaleRepository medicinaleRepository) {
         this.magazineRepository = magazineRepository;
-        this.authenticationService = authenticationService;
-        this.utenteRepository = utenteRepository;
         this.medicinaleRepository = medicinaleRepository;
     }
 
 
-    public Magazine getUserStock() {
-        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (utente == null) {
-            throw new IllegalArgumentException("Utente autenticato non trovato");
+    @Transactional
+    public Magazine getStock() {
+        return magazineRepository.findAll().stream().findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Magazzino non trovato"));
+    }
+
+    @Transactional
+    public Magazine createMagazine(Magazine magazine) {
+        if (magazineRepository.count() > 0) {
+            throw new IllegalStateException("Esiste già un magazzino. Non puoi crearne un altro.");
         }
-
-
-        return magazineRepository.findByUtenteId(utente.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Magazzino non trovato per l'utente"));
+        return magazineRepository.save(magazine);
     }
 
 
-
-    public void updateUserStock(Magazine magazine) {
-        String username = authenticationService.getUsername();
-        Utente utente = utenteRepository.findByUsername(username);
-        if (utente == null) {
-            throw new IllegalArgumentException("Utente autenticato non trovato");
-        }
-
-        magazineRepository.save(magazine);
+    @Transactional
+    public void updateStock(Magazine magazine) {
+        Magazine existingMagazine = getStock();
+        existingMagazine.setStockDisponibile(magazine.getStockDisponibile());
+        existingMagazine.setCapienzaMassima(magazine.getCapienzaMassima());
+        magazineRepository.save(existingMagazine);
     }
 
+
+    @Transactional
     public boolean aggiornaScorte(Long medicinaleId, int quantita) {
         Optional<Medicinale> medicinaleOpt = medicinaleRepository.findById(medicinaleId);
 

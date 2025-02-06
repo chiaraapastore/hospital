@@ -12,9 +12,7 @@ public class Magazine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
-    @ManyToOne
-    @JoinColumn(name = "utente_id", nullable = true)
-    private Utente utente;
+    private String nome;
+    private int capienzaMassima;
+    private int stockDisponibile;
 }

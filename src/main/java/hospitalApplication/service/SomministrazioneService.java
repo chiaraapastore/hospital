@@ -3,6 +3,7 @@ package hospitalApplication.service;
 import hospitalApplication.models.Somministrazione;
 import hospitalApplication.repository.SomministrazioneRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class SomministrazioneService {
 
     }
 
+    @Transactional
     public Somministrazione registraSomministrazione(Somministrazione somministrazione) {
         boolean scorteAggiornate = magazzinoService.aggiornaScorte(somministrazione.getMedicinale().getId(), somministrazione.getQuantita());
 

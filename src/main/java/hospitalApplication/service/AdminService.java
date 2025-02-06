@@ -8,8 +8,7 @@ import hospitalApplication.repository.PazienteRepository;
 import hospitalApplication.repository.UtenteRepository;
 import hospitalApplication.repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 
@@ -27,7 +26,7 @@ public class AdminService {
         this.utenteRepository = utenteRepository;
         this.pazienteRepository = pazienteRepository;
     }
-
+    @Transactional
     public String creaReparto(String nomeReparto) {
         System.out.println("Creazione reparto: " + nomeReparto);
         if (nomeReparto == null || nomeReparto.isEmpty()) {
@@ -42,7 +41,7 @@ public class AdminService {
     }
 
 
-
+    @Transactional
     public String aggiungiDottoreAReparto(Long utenteId, Long repartoId) {
 
         Utente utenteAutenticato = utenteRepository.findByUsername(authenticationService.getUsername());
@@ -53,7 +52,7 @@ public class AdminService {
         Utente dottore = utenteRepository.findById(utenteId)
                 .orElseThrow(() -> new IllegalArgumentException("Dottore non trovato con ID: " + utenteId));
 
-        if (!"DOCTOR".equals(dottore.getRole())) {
+        if (!"dottore".equals(dottore.getRole())) {
             throw new IllegalArgumentException("L'utente con ID " + utenteId + " non è un dottore");
         }
 
@@ -67,8 +66,7 @@ public class AdminService {
         return "Dottore " + dottore.getFirstName() + " " + dottore.getLastName() + " assegnato al reparto " + reparto.getNome();
     }
 
-
-
+    @Transactional
     public String assegnaCapoReparto(String nomeUtente, Long repartoId) {
         String authenticatedUsername = authenticationService.getUsername();
         System.out.println("Username autenticato: " + authenticatedUsername);
@@ -103,10 +101,7 @@ public class AdminService {
         return "Utente " + utente.getFirstName() + " " + utente.getLastName() + " assegnato come capo del reparto " + reparto.getNome();
     }
 
-
-
-
-
+    @Transactional
     public String assegnaPazienteAReparto(Long pazienteId, Long repartoId) {
         Paziente paziente = pazienteRepository.findById(pazienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Paziente non trovato con ID: " + pazienteId));

@@ -7,6 +7,7 @@ import hospitalApplication.models.Utente;
 import hospitalApplication.repository.ReportRepository;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,6 +26,7 @@ public class ReportService {
 
     }
 
+    @Transactional
     public List<Report> getAllReports() {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -33,6 +35,7 @@ public class ReportService {
         return reportRepository.findAll();
     }
 
+    @Transactional
     public Optional<Report> getReportById(String id) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -41,6 +44,7 @@ public class ReportService {
         return reportRepository.findById(id);
     }
 
+    @Transactional
     public Report createReport(Report report) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
@@ -56,6 +60,7 @@ public class ReportService {
     }
 
 
+    @Transactional
     public Report updateReport(String id, Report updatedReport) {
         Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
         if (utente == null) {
