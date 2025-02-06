@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("ADMIN")
+@DiscriminatorValue("admin")
 public class AdminDTO extends Utente {
-    private String adminLevel;
+    private String email;
 }

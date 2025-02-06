@@ -70,5 +70,8 @@ public class UtenteService {
         String username = authenticationService.getUsername();
         return utenteRepository.findByUsername(username);
     }
+
+
+    //todo assegna utente a reparto che sia o ruolo capo-reparto o dottore
 }
 

@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("DOCTOR")
+@DiscriminatorValue("doctor")
 public class DoctorDTO extends Utente {
-        private String specialty;
+        private String email;
 }

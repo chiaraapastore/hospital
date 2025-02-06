@@ -2,9 +2,6 @@ package hospitalApplication.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.mapping.List;
-
-import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor

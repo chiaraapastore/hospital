@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/utente-reparto")
+@RequestMapping("/api/dottore")
 public class DoctorController {
 
     private final DoctorService userDepartmentService;
@@ -14,9 +14,9 @@ public class DoctorController {
         this.userDepartmentService = userDepartmentService;
     }
 
-    @GetMapping("/visualizza-referenze/{repartoId}")
-    public ResponseEntity<String> visualizzaReferenzeReparto(@PathVariable Long repartoId) {
-        String response = userDepartmentService.visualizzaReferenzeReparto(repartoId);
+    @GetMapping("/visualizza-medicine/{repartoId}")
+    public ResponseEntity<String> visualizzaMedicineReparto(@PathVariable Long repartoId) {
+        String response = userDepartmentService.visualizzaMedicineReparto(repartoId);
         return ResponseEntity.ok(response);
     }
 
@@ -25,4 +25,6 @@ public class DoctorController {
         String response = userDepartmentService.somministraMedicine(pazienteId, medicinaleId);
         return ResponseEntity.ok(response);
     }
+
+
 }
