@@ -2,6 +2,7 @@ package hospitalApplication.service;
 
 import hospitalApplication.config.AuthenticationService;
 import hospitalApplication.models.Department;
+import hospitalApplication.models.DoctorDTO;
 import hospitalApplication.models.Paziente;
 import hospitalApplication.models.Utente;
 import hospitalApplication.repository.PazienteRepository;
@@ -102,18 +103,22 @@ public class AdminService {
     }
 
     @Transactional
-    public String assegnaPazienteAReparto(Long pazienteId, Long repartoId) {
-        Paziente paziente = pazienteRepository.findById(pazienteId)
-                .orElseThrow(() -> new IllegalArgumentException("Paziente non trovato con ID: " + pazienteId));
+    public String assegnaDottoreAReparto(Long utenteId, Long repartoId) {
+        Utente utente = utenteRepository.findById(utenteId)
+                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato con ID: " + utenteId));
+
+        if (!utente.getRole().equals("dottore")) {
+            throw new IllegalArgumentException("L'utente con ID " + utenteId + " non è un dottore.");
+        }
 
         Department reparto = departmentRepository.findById(repartoId)
                 .orElseThrow(() -> new IllegalArgumentException("Reparto non trovato con ID: " + repartoId));
 
-        paziente.setReparto(reparto);
+        utente.setReparto(reparto);
 
-        pazienteRepository.save(paziente);
+        utenteRepository.save(utente);
 
-        return "Paziente con ID " + pazienteId + " assegnato al reparto " + reparto.getNome();
+        return "Dottore con ID " + utenteId + " assegnato al reparto " + reparto.getNome();
     }
 
 }
