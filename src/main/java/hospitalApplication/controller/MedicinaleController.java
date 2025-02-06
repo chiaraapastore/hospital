@@ -36,6 +36,7 @@ public class MedicinaleController {
         return ResponseEntity.ok(medicinaleService.updateMedicinaleQuantity(id, quantity));
     }
 
+
     @DeleteMapping("/delete/{id}/")
     public ResponseEntity<Void> deleteMedicinale(@PathVariable Long id) {
         medicinaleService.deleteMedicinale(id);
