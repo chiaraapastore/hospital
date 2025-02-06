@@ -3,6 +3,7 @@ package hospitalApplication.controller;
 import hospitalApplication.models.Notification;
 import hospitalApplication.models.Utente;
 import hospitalApplication.service.NotificationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -18,10 +19,17 @@ public class NotificationController {
     }
 
     @PostMapping("/welcome/{userId}")
-    public ResponseEntity<Void> sendWelcomeNotification(@PathVariable Long userId) {
+    public ResponseEntity<String> sendWelcomeNotification(@PathVariable Long userId) {
         Utente user = notificationService.getUserById(userId);
-        notificationService.sendWelcomeNotification(user);
-        return ResponseEntity.ok().build();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato.");
+        }
+        try {
+            notificationService.sendWelcomeNotification(user);
+            return ResponseEntity.ok("Notifica di benvenuto inviata con successo.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante l'invio della notifica: " + e.getMessage());
+        }
     }
 
     @PostMapping("/new-patient")

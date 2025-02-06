@@ -114,8 +114,9 @@ public class NotificationService {
     }
 
     @Transactional
-    public Utente getUserById(Long doctorId) {
-        return utenteRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Utente con ID " + doctorId + " non trovato"));
+    public Utente getUserById(Long userId) {
+        return utenteRepository.findById(userId)
+                .orElse(null);
     }
+
 }
