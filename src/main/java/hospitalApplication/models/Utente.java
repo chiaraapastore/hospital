@@ -1,5 +1,6 @@
 package hospitalApplication.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.*;
@@ -23,6 +24,11 @@ public class Utente {
     private String lastName;
     @NotBlank(message = "Email obbligatoria")
     private String email;
+    private String numeroMatricola;
+    private String telefono;
+    @Column(name = "profile_image")
+    private String profileImage;
+
 
     private String role;
     private String password;
@@ -30,11 +36,19 @@ public class Utente {
     private String keycloakId;
 
 
+
     @ManyToOne
     @JoinColumn(name = "reparto_id")
+    @JsonBackReference
+    @ToString.Exclude
     private Department reparto;
 
     public void setReparto(Department reparto) {
         this.reparto = reparto;
+    }
+
+    @Transient
+    public String getRepartoNome() {
+        return reparto != null ? reparto.getNome() : "Nessun reparto assegnato";
     }
 }

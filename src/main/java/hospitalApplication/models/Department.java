@@ -1,5 +1,6 @@
 package hospitalApplication.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,10 +14,13 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     private String nome;
 
     @OneToOne
     @JoinColumn(name = "capo_reparto_id", referencedColumnName = "id", unique = true)
+    @JsonManagedReference
+    @ToString.Exclude
     private Utente capoReparto;
 
 }

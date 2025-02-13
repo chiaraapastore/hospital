@@ -6,9 +6,11 @@ import hospitalApplication.service.PazienteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/pazienti")
 public class PazienteController {
 
@@ -18,6 +20,11 @@ public class PazienteController {
         this.pazienteService = pazienteService;
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<Paziente>> getAllPazienti() {
+        List<Paziente> pazienti = pazienteService.getAllPazienti();
+        return ResponseEntity.ok(pazienti);
+    }
 
     @GetMapping("/search/{id}")
     public ResponseEntity<Paziente> getPazienteById(@PathVariable Long id) {

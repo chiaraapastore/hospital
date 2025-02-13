@@ -5,6 +5,13 @@ import hospitalApplication.models.Utente;
 import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 
 @Service
@@ -12,6 +19,7 @@ public class UtenteService {
 
     private final UtenteRepository utenteRepository;
     private final AuthenticationService authenticationService;
+    private static final String UPLOAD_DIR = "uploads";
 
     public UtenteService(UtenteRepository utenteRepository, AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
@@ -71,7 +79,31 @@ public class UtenteService {
         return utenteRepository.findByUsername(username);
     }
 
+    @Transactional
+    public Utente getUtenteByKeycloakId(String keycloakId) {
+        return utenteRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new RuntimeException("Nessun utente trovato con Keycloak ID: " + keycloakId));
+    }
 
-    //todo assegna utente a reparto che sia o ruolo capo-reparto o dottore
+
+    public String uploadProfileImage(Long id, MultipartFile file) throws IOException {
+        Utente utente = utenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + id));
+
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String fileName = "profile_" + id + "_" + System.currentTimeMillis() + ".jpg";
+        Path filePath = uploadPath.resolve(fileName);
+
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        utente.setProfileImage("/" + UPLOAD_DIR + fileName);
+        utenteRepository.save(utente);
+
+        return utente.getProfileImage();
+    }
 }
 

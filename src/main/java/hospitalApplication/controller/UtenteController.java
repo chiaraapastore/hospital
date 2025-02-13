@@ -3,13 +3,20 @@ package hospitalApplication.controller;
 import hospitalApplication.config.AuthenticationService;
 import hospitalApplication.models.TokenRequest;
 import hospitalApplication.models.Utente;
+import hospitalApplication.models.UtenteDTO;
 import hospitalApplication.service.KeycloakService;
 import hospitalApplication.service.UtenteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/utente")
 public class UtenteController {
 
@@ -44,10 +51,31 @@ public class UtenteController {
     }
 
     @GetMapping("/user-info")
-    public ResponseEntity<String> getUserInfo() {
-        String userId = authenticationService.getUserId();
-        return ResponseEntity.ok("User ID: " + userId);
+    public ResponseEntity<UtenteDTO> getUserInfo(@AuthenticationPrincipal Jwt jwt) {
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String keycloakId = jwt.getClaim("sub");
+        Utente utente = utenteService.getUtenteByKeycloakId(keycloakId);
+
+        if (utente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        UtenteDTO utenteDTO = new UtenteDTO(utente);
+
+        if (utente.getReparto() != null) {
+            utenteDTO.setRepartoId(utente.getReparto().getId());
+            utenteDTO.setNomeReparto(utente.getReparto().getNome());
+        } else {
+            utenteDTO.setRepartoId(null);
+            utenteDTO.setNomeReparto("Nessun reparto assegnato");
+        }
+
+        return ResponseEntity.ok(utenteDTO);
     }
+
 
     @GetMapping("/utenti/{email}")
     public ResponseEntity<Utente> getUtenteByEmail(@PathVariable String email) {
@@ -90,6 +118,16 @@ public class UtenteController {
     public ResponseEntity<Boolean> checkUserExists(@RequestParam String username) {
         boolean exists = utenteService.userExistsByUsername(username);
         return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/upload-profile-image/{id}")
+    public ResponseEntity<String> uploadProfileImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            String imageUrl = utenteService.uploadProfileImage(id, file);
+            return ResponseEntity.ok(imageUrl);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel caricamento dell'immagine.");
+        }
     }
 
 }

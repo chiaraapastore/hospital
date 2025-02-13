@@ -31,19 +31,10 @@ public class DoctorService {
     }
 
     @Transactional
-    public String visualizzaMedicineReparto(Long repartoId) {
-        String username = authenticationService.getUsername();
-        System.out.println("Username autenticato: " + username);
-        Utente utente = utenteRepository.findByUsername(username);
-        if (utente == null) {
-            throw new IllegalArgumentException("Utente con username '" + username + "' non trovato nel database.");
-        }
-
-
-        List<Medicinale> medicinali = medicinaleRepository.findByDepartmentId(repartoId);
-
-        return "Referenze disponibili per il reparto con ID " + repartoId + ": " + medicinali;
+    public List<Medicinale> visualizzaMedicineReparto(Long repartoId) {
+        return medicinaleRepository.findByDepartmentId(repartoId);
     }
+
 
     @Transactional
     public String somministraMedicine(Long pazienteId, Long medicinaleId) {
