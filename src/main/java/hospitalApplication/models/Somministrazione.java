@@ -1,5 +1,6 @@
 package hospitalApplication.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -23,6 +24,11 @@ public class Somministrazione {
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)
     private Utente utente;
+
+    @ManyToOne
+    @JoinColumn(name = "paziente_id", nullable = true)
+    private Paziente paziente;
+
 
     private LocalDateTime dataOra;
 }

@@ -59,4 +59,19 @@ public class DoctorService {
         return "Medicine somministrata con successo al paziente " + paziente.getNome() +
                 " con il medicinale " + medicinale.getNome();
     }
+
+    @Transactional
+    public List<Paziente> getPazientiDelDottore() {
+        String username = authenticationService.getUsername();
+        Utente dottore = utenteRepository.findByUsername(username);
+        if (dottore == null) {
+            throw new IllegalArgumentException("Dottore non trovato");
+        }
+
+        List<Paziente> pazienti = pazienteRepository.findByDottore(dottore);
+        System.out.println("Pazienti del dottore " + username + ": " + pazienti);
+        return pazienti;
+    }
+
+
 }

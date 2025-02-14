@@ -44,9 +44,8 @@ public class DoctorController {
 
     @GetMapping("/pazienti")
     public ResponseEntity<List<Paziente>> getPazienti() {
-        List<Paziente> pazienti = pazienteRepository.findAll();
+        List<Paziente> pazienti = doctorService.getPazientiDelDottore();
         return ResponseEntity.ok(pazienti);
     }
-
 
 }

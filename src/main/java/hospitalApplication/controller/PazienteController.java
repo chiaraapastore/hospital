@@ -1,11 +1,18 @@
 package hospitalApplication.controller;
 
+import com.itextpdf.text.DocumentException;
 import hospitalApplication.models.Paziente;
 import hospitalApplication.service.AdminService;
+import hospitalApplication.service.DoctorService;
 import hospitalApplication.service.PazienteService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +39,13 @@ public class PazienteController {
         return paziente.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+
+
     @PostMapping("/save")
     public ResponseEntity<Paziente> savePaziente(@RequestBody Paziente paziente) {
+        if (paziente.getDataRicovero() == null) {
+            paziente.setDataRicovero(new Date());
+        }
         Paziente savedPaziente = pazienteService.savePaziente(paziente);
         return ResponseEntity.ok(savedPaziente);
     }
@@ -43,4 +55,15 @@ public class PazienteController {
         pazienteService.deletePaziente(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/cartella-clinica")
+    public ResponseEntity<byte[]> getCartellaClinicaPdf(@PathVariable Long id) throws DocumentException {
+        byte[] pdfBytes = pazienteService.generateCartellaClinicaPdf(id);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=cartella_clinica.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+    }
+
 }
