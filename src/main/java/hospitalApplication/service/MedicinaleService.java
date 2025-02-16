@@ -87,4 +87,7 @@ public class MedicinaleService {
         medicinaleRepository.deleteById(id);
     }
 
+    public List<Medicinale> getMedicinaliDisponibili() {
+        return medicinaleRepository.findByQuantitaGreaterThan(0);
+    }
 }

@@ -5,6 +5,7 @@ import hospitalApplication.service.MedicinaleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -63,6 +64,11 @@ public class MedicinaleController {
         return ResponseEntity.ok("Il medicinale: " + medicinale.getNome() + " ha una quantità sufficiente.");
     }
 
+    @GetMapping("/disponibili")
+    public ResponseEntity<List<Medicinale>> getMedicinaliDisponibili() {
+        List<Medicinale> medicinali = medicinaleService.getMedicinaliDisponibili();
+        return ResponseEntity.ok(medicinali);
+    }
 
 
 }

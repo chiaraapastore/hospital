@@ -10,5 +10,8 @@ import lombok.*;
 @Entity
 @DiscriminatorValue("doctor")
 public class DoctorDTO extends Utente {
+        private Long id;
+        private String firstName;
+        private String lastName;
         private String email;
 }

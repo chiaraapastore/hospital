@@ -68,4 +68,21 @@ public class NotificationController {
         List<Notification> notifications = notificationService.getUserNotifications(user);
         return ResponseEntity.ok(notifications);
     }
+
+    @PostMapping("/send")
+    public ResponseEntity<String> sendNotification(@RequestBody Notification notification) {
+        notificationService.sendNotification(notification);
+        return ResponseEntity.ok("Notifica inviata con successo.");
+    }
+
+    @GetMapping("/capo-reparto/{chiefId}")
+    public ResponseEntity<List<Notification>> getNotificationsForChief(@PathVariable Long chiefId) {
+        Utente chief = notificationService.getUserById(chiefId);
+        if (chief == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        List<Notification> notifications = notificationService.getNotificationsFromDoctors(chief);
+        return ResponseEntity.ok(notifications);
+    }
+
 }

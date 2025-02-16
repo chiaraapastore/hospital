@@ -119,4 +119,14 @@ public class NotificationService {
                 .orElse(null);
     }
 
+    public void sendNotification(Notification notification) {
+        System.out.println("NOTIFICA INVIATA:");
+        System.out.println("Destinatario: " + notification.getDestinatario());
+        System.out.println("Messaggio: " + notification.getMessaggio());
+    }
+
+    public List<Notification> getNotificationsFromDoctors(Utente chief) {
+        return notificationRepository.findByRecipientAndSenderRole(chief, "DOCTOR");
+    }
+
 }

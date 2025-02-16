@@ -19,6 +19,8 @@ public class Notification {
     private LocalDateTime dataOra;
     private String type;
     private LocalDateTime readNotification;
+    private String destinatario;
+    private String recipient;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)

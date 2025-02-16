@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.*;
+
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,8 +31,10 @@ public class Utente {
     private String telefono;
     @Column(name = "profile_image")
     private String profileImage;
-
-
+    @Column(name = "ferie")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ferie;
+    private String turno;
     private String role;
     private String password;
     private int countNotification;
@@ -51,4 +56,5 @@ public class Utente {
     public String getRepartoNome() {
         return reparto != null ? reparto.getNome() : "Nessun reparto assegnato";
     }
+
 }
