@@ -56,8 +56,11 @@ public class HeadOfDepartmentService {
             throw new IllegalArgumentException("Utente non trovato");
         }
 
-        return "Notifica inviata al reparto " + repartoId + ": " + messaggio;
+        System.out.println("Inviata notifica: " + messaggio);
+
+        return "{\"status\": \"success\", \"message\": \"Notifica inviata al reparto " + repartoId + ": " + messaggio + "\"}";
     }
+
 
 
     @Transactional

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -56,7 +57,10 @@ public class DoctorController {
 
     @GetMapping("/reparto/{repartoId}")
     public ResponseEntity<List<DoctorDTO>> getDottoriByReparto(@PathVariable Long repartoId) {
-        List<DoctorDTO> dottori = doctorService.getDottoriByReparto(repartoId);
+        List<DoctorDTO> dottori = doctorService.getDottoriByReparto(repartoId).stream()
+                .map(dottore -> new DoctorDTO(dottore.getId(), dottore.getFirstName(),
+                        dottore.getLastName(), dottore.getEmail(), dottore.getMatricola()))
+                .collect(Collectors.toList());
         if (dottori.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

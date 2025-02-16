@@ -11,6 +11,7 @@ import hospitalApplication.models.Department;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -49,10 +50,18 @@ public class HeadOfDepartmentController {
 
 
     @PostMapping("/notifica/{repartoId}")
-    public ResponseEntity<String> inviaNotifica(@PathVariable String repartoId, @RequestBody String messaggio) {
+    public ResponseEntity<String> inviaNotifica(@PathVariable String repartoId, @RequestBody Map<String, String> payload) {
+        String messaggio = payload.get("messaggio");
+        if (messaggio == null || messaggio.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Messaggio non valido");
+        }
+
         String response = headOfDepartmentService.inviaNotifica(repartoId, messaggio);
         return ResponseEntity.ok(response);
     }
+
+
+
 
 
     @GetMapping("/reparti")

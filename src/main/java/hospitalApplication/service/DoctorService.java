@@ -100,7 +100,14 @@ public class DoctorService {
     @Transactional
     public List<DoctorDTO> getDottoriByReparto(Long repartoId) {
         return utenteRepository.findByRepartoId(repartoId).stream()
-                .map(dottore -> new DoctorDTO(dottore.getId(), dottore.getFirstName(), dottore.getLastName(), dottore.getEmail()))
+                .map(dottore -> new DoctorDTO(
+                        dottore.getId(),
+                        dottore.getFirstName(),
+                        dottore.getLastName(),
+                        dottore.getEmail(),
+                        dottore.getNumeroMatricola()
+                ))
                 .collect(Collectors.toList());
     }
+
 }
