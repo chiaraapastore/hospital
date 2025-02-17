@@ -61,7 +61,12 @@ public class NotificationService {
         }
     }
 
-    private void createAndSendNotification(Utente sender, Utente receiver, String message, String type) {
+    void createAndSendNotification(Utente sender, Utente receiver, String message, String type) {
+        if (receiver == null) {
+            System.err.println("Errore: il destinatario della notifica è null. Notifica non inviata.");
+            return;
+        }
+
         Notification notification = new Notification();
         notification.setMessaggio(message);
         notification.setSender(sender);
@@ -74,6 +79,7 @@ public class NotificationService {
         receiver.setCountNotification(receiver.getCountNotification() + 1);
         utenteRepository.save(receiver);
     }
+
 
     @Transactional
     public void markNotificationAsRead(Long notificationId) {
@@ -128,5 +134,17 @@ public class NotificationService {
     public List<Notification> getNotificationsFromDoctors(Utente chief) {
         return notificationRepository.findByRecipientAndSenderRole(chief, "DOCTOR");
     }
+
+    @Transactional
+    public void sendNotification(String admin, String reportMessage) {
+        Notification notification = new Notification();
+        notification.setDestinatario(admin);
+        notification.setMessaggio(reportMessage);
+        notification.setLetta(false);
+        notificationRepository.save(notification);
+
+        System.out.println("Notifica salvata per " + admin + ": " + reportMessage);
+    }
+
 
 }

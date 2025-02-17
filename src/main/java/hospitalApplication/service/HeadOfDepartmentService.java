@@ -30,24 +30,6 @@ public class HeadOfDepartmentService {
         this.departmentRepository = departmentRepository;
     }
 
-    @Transactional
-    public String aggiornaScorteReparto(Long repartoId, Long medicinaleId, int nuovaQuantita) {
-        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (utente == null) {
-            throw new IllegalArgumentException("Utente non trovato");
-        }
-
-        Medicinale medicinale = medicinaleRepository.findById(medicinaleId)
-                .orElseThrow(() -> new IllegalArgumentException("Medicinale non trovato"));
-
-        if (!medicinale.getDepartment().getId().equals(repartoId)) {
-            throw new IllegalArgumentException("Il medicinale non appartiene al reparto specificato");
-        }
-
-        medicinale.setQuantita(nuovaQuantita);
-        medicinaleRepository.save(medicinale);
-        return "Scorte aggiornate per la referenza " + medicinaleId + " nel reparto " + repartoId;
-    }
 
     @Transactional
     public String inviaNotifica(String repartoId, String messaggio) {

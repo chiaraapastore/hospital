@@ -2,6 +2,7 @@ package hospitalApplication.controller;
 
 import hospitalApplication.models.Magazine;
 import hospitalApplication.service.MagazineService;
+import hospitalApplication.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class MagazineController {
 
     private final MagazineService magazineService;
+    private final ReportService reportService;
 
     @PostMapping("/create")
     public ResponseEntity<Magazine> createMagazine(@RequestBody Magazine magazine) {
@@ -25,9 +27,27 @@ public class MagazineController {
         return ResponseEntity.ok(magazineService.getStock());
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Void> updateStock(@RequestBody Magazine magazine) {
-        magazineService.updateStock(magazine);
-        return ResponseEntity.ok().build();
+    @PutMapping("/update-stock-and-report")
+    public ResponseEntity<Void> updateStockAndSendReport(@RequestBody Magazine magazine) {
+        System.out.println("Dati ricevuti dal frontend: " + magazine);
+
+        if (magazine == null || magazine.getId() == null) {
+            System.err.println("Errore: Magazine nullo o senza ID!");
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            magazineService.updateStock(magazine);
+            reportService.generateStockReport(magazine);
+            System.out.println("Stock aggiornato e report inviato!");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("Errore nel backend: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
+
+
+
 }

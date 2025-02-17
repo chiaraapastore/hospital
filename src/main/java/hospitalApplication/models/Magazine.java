@@ -15,4 +15,8 @@ public class Magazine {
     private String nome;
     private int capienzaMassima;
     private int stockDisponibile;
+    @Column(name = "punto_riordino", nullable = false)
+    private int puntoRiordino = 10;
+
+
 }

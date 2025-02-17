@@ -20,11 +20,11 @@ public class Report {
     private LocalTime ora;
 
     @ManyToOne
-    @JoinColumn(name = "paziente_id", nullable = false)
+    @JoinColumn(name = "paziente_id")
     private Paziente paziente;
 
 
     @ManyToOne
-    @JoinColumn(name = "autore_id", nullable = false)
+    @JoinColumn(name = "autore_id")
     private Utente autore;
 }

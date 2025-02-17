@@ -16,4 +16,5 @@ public interface PazienteRepository extends JpaRepository<Paziente, Long> {
     @Query("SELECT p FROM Paziente p LEFT JOIN FETCH p.farmaciSomministrati WHERE p.id = :id")
     Optional<Paziente> findByIdWithFarmaciSomministrati(@Param("id") Long id);
 
+    Paziente findFirstByOrderByIdAsc();
 }

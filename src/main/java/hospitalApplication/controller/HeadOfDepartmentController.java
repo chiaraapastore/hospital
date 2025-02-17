@@ -28,15 +28,6 @@ public class HeadOfDepartmentController {
         this.adminService = adminService;
     }
 
-    @PutMapping("/aggiorna-scorte/{repartoId}/{medicinaId}")
-    public ResponseEntity<String> aggiornaScorteReparto(
-            @PathVariable Long repartoId,
-            @PathVariable Long medicinaId,
-            @RequestParam int nuovaQuantita
-    ) {
-        String response = headOfDepartmentService.aggiornaScorteReparto(repartoId, medicinaId, nuovaQuantita);
-        return ResponseEntity.ok(response);
-    }
 
     @PutMapping("/assegna-ferie/{doctorId}")
     public ResponseEntity<Void> assegnaFerie(
