@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,17 +31,17 @@ public class AdminService {
         this.pazienteRepository = pazienteRepository;
     }
     @Transactional
-    public String creaReparto(String nomeReparto) {
-        System.out.println("Creazione reparto: " + nomeReparto);
-        if (nomeReparto == null || nomeReparto.isEmpty()) {
-            throw new IllegalArgumentException("Il nome del reparto non può essere vuoto");
+    public String creaReparto(String repartoNome) {
+        Optional<Department> existingReparti = departmentRepository.findFirstByNome(repartoNome);
+        if (!existingReparti.isEmpty()) {
+            return "Errore: Il reparto esiste già!";
         }
 
         Department reparto = new Department();
-        reparto.setNome(nomeReparto);
+        reparto.setNome(repartoNome);
         departmentRepository.save(reparto);
 
-        return "Reparto " + nomeReparto + " creato con successo";
+        return "Reparto aggiunto con successo!";
     }
 
 
@@ -167,15 +168,13 @@ public class AdminService {
 
 
     @Transactional
-    public String creaDottore(String firstName, String lastName, String email, Department reparto) {
-        if (reparto == null) {
-            reparto = departmentRepository.findByNome("Medicina Generale");
-            if (reparto == null) {
-                reparto = new Department();
-                reparto.setNome("Medicina Generale");
-                departmentRepository.save(reparto);
-            }
-        }
+    public String creaDottore(String firstName, String lastName, String email, String repartoNome) {
+        Department reparto = departmentRepository.findFirstByNome(repartoNome)
+                .orElseGet(() -> {
+                    Department newReparto = new Department();
+                    newReparto.setNome(repartoNome);
+                    return departmentRepository.save(newReparto);
+                });
 
         Utente dottore = new Utente();
         dottore.setFirstName(firstName);
@@ -188,19 +187,8 @@ public class AdminService {
         return "Dottore creato con successo e assegnato al reparto " + reparto.getNome();
     }
 
-
-
     @Transactional
     public String creaCapoReparto(String firstName, String lastName, String email, Department reparto) {
-        if (reparto == null) {
-            reparto = departmentRepository.findByNome("Medicina Generale");
-            if (reparto == null) {
-                reparto = new Department();
-                reparto.setNome("Medicina Generale");
-                departmentRepository.save(reparto);
-            }
-        }
-
         Utente capoReparto = new Utente();
         capoReparto.setFirstName(firstName);
         capoReparto.setLastName(lastName);
@@ -211,6 +199,8 @@ public class AdminService {
         utenteRepository.save(capoReparto);
         return "Capo Reparto creato con successo e assegnato al reparto " + reparto.getNome();
     }
+
+
 
 
 }
