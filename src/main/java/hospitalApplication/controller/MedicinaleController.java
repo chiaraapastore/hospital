@@ -1,11 +1,13 @@
 package hospitalApplication.controller;
 
 import hospitalApplication.models.Medicinale;
+import hospitalApplication.repository.MedicinaleRepository;
 import hospitalApplication.service.MedicinaleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -14,9 +16,11 @@ import java.util.Optional;
 public class MedicinaleController {
 
     private final MedicinaleService medicinaleService;
+    private final MedicinaleRepository medicinaleRepository;
 
-    public MedicinaleController(MedicinaleService medicinaleService) {
+    public MedicinaleController(MedicinaleService medicinaleService, MedicinaleRepository medicinaleRepository) {
         this.medicinaleService = medicinaleService;
+        this.medicinaleRepository = medicinaleRepository;
     }
 
     @GetMapping("/search/{id}")
@@ -31,13 +35,40 @@ public class MedicinaleController {
         return ResponseEntity.ok(savedMedicinale);
     }
 
-    @PutMapping("/{id}/update-quantity")
-    public ResponseEntity<Medicinale> updateMedicinaleQuantity(
+    @PutMapping("/{id}/update-available-quantity")
+    public ResponseEntity<Medicinale> updateMedicinaleAvailableQuantity(
             @PathVariable Long id,
-            @RequestBody int quantity) {
-        return ResponseEntity.ok(medicinaleService.updateMedicinaleQuantity(id, quantity));
+            @RequestBody Map<String, Integer> request) {
+
+        int availableQuantity = request.get("availableQuantity");
+
+        medicinaleService.updateMedicinaleAvailableQuantity(id, availableQuantity);
+
+        Medicinale updated = medicinaleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Medicinale non trovato dopo l'aggiornamento!"));
+
+        System.out.println("💡 Backend sta restituendo available_quantity: " + updated.getAvailableQuantity());
+
+        return ResponseEntity.ok(updated);
     }
 
+
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Medicinale> updateMedicinale(@PathVariable Long id, @RequestBody Medicinale medicinale) {
+        Optional<Medicinale> existingMedicinale = medicinaleRepository.findById(id);
+        if (existingMedicinale.isPresent()) {
+            Medicinale updated = existingMedicinale.get();
+            updated.setQuantita(medicinale.getQuantita());
+            updated.setScadenza(medicinale.getScadenza());
+            updated.setCategoria(medicinale.getCategoria());
+            medicinaleRepository.save(updated);
+            return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @DeleteMapping("/delete/{id}/")
     public ResponseEntity<Void> deleteMedicinale(@PathVariable Long id) {

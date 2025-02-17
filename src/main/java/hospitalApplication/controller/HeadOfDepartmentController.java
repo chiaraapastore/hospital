@@ -1,5 +1,6 @@
 package hospitalApplication.controller;
 
+import hospitalApplication.models.Medicinale;
 import hospitalApplication.service.AdminService;
 import hospitalApplication.service.HeadOfDepartmentService;
 
@@ -12,6 +13,7 @@ import hospitalApplication.models.Department;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -35,10 +37,6 @@ public class HeadOfDepartmentController {
         String response = headOfDepartmentService.aggiornaScorteReparto(repartoId, medicinaId, nuovaQuantita);
         return ResponseEntity.ok(response);
     }
-    @PostMapping("/assegna-dottore-reparto")
-    public ResponseEntity<String> assegnaDottoreAReparto(@RequestParam Long dottoreId, @RequestParam Long repartoId) {
-        return ResponseEntity.ok(adminService.assegnaDottoreAReparto(dottoreId, repartoId));
-    }
 
     @PutMapping("/assegna-ferie/{doctorId}")
     public ResponseEntity<Void> assegnaFerie(
@@ -60,10 +58,6 @@ public class HeadOfDepartmentController {
         return ResponseEntity.ok(response);
     }
 
-
-
-
-
     @GetMapping("/reparti")
     public ResponseEntity<List<Department>> getReparti(){
         List<Department> reparti = headOfDepartmentService.getReparti();
@@ -76,6 +70,11 @@ public class HeadOfDepartmentController {
         return ResponseEntity.ok(ferie);
     }
 
+    @PostMapping("/aggiungi-medicinale")
+    public ResponseEntity<String> aggiungiMedicinale(@RequestBody Medicinale medicinale) {
+        String response = headOfDepartmentService.aggiungiMedicinale(medicinale);
+        return ResponseEntity.ok(response);
+    }
 
 
 }

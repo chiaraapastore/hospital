@@ -101,4 +101,19 @@ public class HeadOfDepartmentService {
                 "2025-12-24", "2025-12-25", "2025-12-26"
         );
     }
+
+    @Transactional
+    public String aggiungiMedicinale(Medicinale medicinale) {
+        Department reparto = departmentRepository.findById(medicinale.getDepartment().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Reparto non trovato"));
+
+        Medicinale nuovoMedicinale = new Medicinale();
+        nuovoMedicinale.setNome(medicinale.getNome());
+        nuovoMedicinale.setQuantita(medicinale.getQuantita());
+        nuovoMedicinale.setDepartment(reparto);
+
+        medicinaleRepository.save(nuovoMedicinale);
+        return "Medicinale " + medicinale.getNome() + " aggiunto con successo al reparto " + reparto.getNome();
+    }
+
 }

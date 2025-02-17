@@ -17,6 +17,8 @@ public class Department {
 
     private String nome;
 
+    private int countMedicinali;
+
     @OneToOne
     @JoinColumn(name = "capo_reparto_id", referencedColumnName = "id", unique = true)
     @JsonManagedReference

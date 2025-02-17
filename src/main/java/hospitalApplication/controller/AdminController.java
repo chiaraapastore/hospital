@@ -25,16 +25,15 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/aggiungi-dottore-reparto")
-    public String aggiungiDottoreAReparto(@RequestParam Long utenteId, @RequestParam Long repartoId) {
-        return adminService.aggiungiDottoreAReparto(utenteId, repartoId);
-    }
-
     @PostMapping("/assegna-capo-reparto")
     public ResponseEntity<String> assegnaCapoReparto(@RequestParam String nomeUtente, @RequestParam Long repartoId) {
         String response = adminService.assegnaCapoReparto(nomeUtente, repartoId);
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/assegna-dottore-reparto")
+    public ResponseEntity<String> assegnaDottoreAReparto(@RequestParam Long dottoreId, @RequestParam Long repartoId) {
+        return ResponseEntity.ok(adminService.assegnaDottoreAReparto(dottoreId, repartoId));
+    }
 }
 
