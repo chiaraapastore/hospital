@@ -15,4 +15,6 @@ public class DoctorDTO extends Utente {
         private String lastName;
         private String email;
         private String matricola;
+        private String repartoNome;
+
 }

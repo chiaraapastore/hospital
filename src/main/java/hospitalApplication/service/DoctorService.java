@@ -3,11 +3,9 @@ package hospitalApplication.service;
 import hospitalApplication.config.AuthenticationService;
 import hospitalApplication.models.*;
 import hospitalApplication.repository.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -105,7 +103,8 @@ public class DoctorService {
                         dottore.getFirstName(),
                         dottore.getLastName(),
                         dottore.getEmail(),
-                        dottore.getNumeroMatricola()
+                        dottore.getNumeroMatricola(),
+                        dottore.getRepartoNome()
                 ))
                 .collect(Collectors.toList());
     }
