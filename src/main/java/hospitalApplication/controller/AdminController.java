@@ -65,7 +65,6 @@ public class AdminController {
         System.out.println("API ricevuta: Assegna capo reparto ID " + utenteId + " al reparto ID " + repartoId);
 
         if (utenteId == null || repartoId == null) {
-            System.out.println("Errore: Parametri mancanti!");
             return ResponseEntity.badRequest().body(Map.of("error", "Parametri mancanti."));
         }
 
@@ -73,12 +72,10 @@ public class AdminController {
         Optional<Department> departmentOpt = departmentRepository.findById(repartoId);
 
         if (userOpt.isEmpty()) {
-            System.out.println("Errore: Utente non trovato!");
             return ResponseEntity.badRequest().body(Map.of("error", "Utente non trovato."));
         }
 
         if (departmentOpt.isEmpty()) {
-            System.out.println("Errore: Reparto non trovato!");
             return ResponseEntity.badRequest().body(Map.of("error", "Reparto non trovato."));
         }
 
@@ -86,14 +83,14 @@ public class AdminController {
         Department nuovoReparto = departmentOpt.get();
 
         Optional<Department> repartoAttualeOpt = departmentRepository.findByCapoReparto(utente);
-        if (repartoAttualeOpt.isPresent()) {
-            Department repartoAttuale = repartoAttualeOpt.get();
+        repartoAttualeOpt.ifPresent(repartoAttuale -> {
             repartoAttuale.setCapoReparto(null);
             departmentRepository.save(repartoAttuale);
-            System.out.println("Capo rimosso dal vecchio reparto " + repartoAttuale.getNome());
-        }
+        });
 
         nuovoReparto.setCapoReparto(utente);
+        utente.setReparto(nuovoReparto);
+        utenteRepository.save(utente);
         departmentRepository.save(nuovoReparto);
 
         System.out.println("Capo reparto aggiornato con successo: " + utente.getFirstName() + " → " + nuovoReparto.getNome());
@@ -103,38 +100,33 @@ public class AdminController {
 
 
 
+
     @PutMapping("/assegna-dottore-reparto/{utenteId}/{repartoId}")
-    public ResponseEntity<String> assegnaDottoreAReparto(@PathVariable Long utenteId, @PathVariable Long repartoId) {
+    public ResponseEntity<Map<String, String>> assegnaDottoreAReparto(@PathVariable Long utenteId, @PathVariable Long repartoId) {
         System.out.println("Ricevuta richiesta: Cambio reparto per dottore ID " + utenteId + " → Reparto ID " + repartoId);
 
         Optional<Utente> dottoreOpt = utenteRepository.findById(utenteId);
         Optional<Department> repartoOpt = departmentRepository.findById(repartoId);
 
         if (dottoreOpt.isEmpty()) {
-            System.out.println("Errore: Dottore non trovato.");
-            return ResponseEntity.badRequest().body("Errore: Dottore non trovato.");
+            return ResponseEntity.badRequest().body(Map.of("error", "Dottore non trovato."));
         }
 
         if (repartoOpt.isEmpty()) {
-            System.out.println("Errore: Reparto non trovato.");
-            return ResponseEntity.badRequest().body("Errore: Reparto non trovato.");
+            return ResponseEntity.badRequest().body(Map.of("error", "Reparto non trovato."));
         }
 
         Utente dottore = dottoreOpt.get();
         Department reparto = repartoOpt.get();
 
-        System.out.println("Reparto attuale: " + (dottore.getReparto() != null ? dottore.getReparto().getNome() : "Nessuno"));
-        System.out.println("Nuovo reparto assegnato: " + reparto.getNome());
-
         dottore.setReparto(reparto);
         utenteRepository.saveAndFlush(dottore);
 
+        System.out.println("Dottore aggiornato al reparto: " + reparto.getNome());
 
-        Optional<Utente> updatedDottore = utenteRepository.findById(utenteId);
-        System.out.println(" Reparto aggiornato nel DB: " + (updatedDottore.get().getReparto() != null ? updatedDottore.get().getReparto().getNome() : "Nessuno"));
-
-        return ResponseEntity.ok("Dottore assegnato al reparto " + reparto.getNome());
+        return ResponseEntity.ok(Map.of("message", "Dottore assegnato al reparto " + reparto.getNome()));
     }
+
 
 
 
