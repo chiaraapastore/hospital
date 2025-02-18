@@ -1,16 +1,13 @@
 package hospitalApplication.service;
 
 import hospitalApplication.config.AuthenticationService;
-import hospitalApplication.models.Department;
-import hospitalApplication.models.DoctorDTO;
-import hospitalApplication.models.Utente;
-import hospitalApplication.repository.PazienteRepository;
-import hospitalApplication.repository.UtenteRepository;
-import hospitalApplication.repository.DepartmentRepository;
+import hospitalApplication.models.*;
+import hospitalApplication.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,14 +18,18 @@ public class AdminService {
     private final UtenteRepository utenteRepository;
     private final DepartmentRepository departmentRepository;
     private final PazienteRepository pazienteRepository;
+    private final MedicinaleRepository medicinaleRepository;
+    private final MagazineRepository magazineRepository;
 
     private final AuthenticationService authenticationService;
 
-    public AdminService(UtenteRepository utenteRepository, DepartmentRepository departmentRepository, AuthenticationService authenticationService, PazienteRepository pazienteRepository) {
+    public AdminService(UtenteRepository utenteRepository, DepartmentRepository departmentRepository, AuthenticationService authenticationService, PazienteRepository pazienteRepository, MedicinaleRepository medicinaleRepository, MagazineRepository magazineRepository) {
         this.departmentRepository = departmentRepository;
         this.authenticationService = authenticationService;
         this.utenteRepository = utenteRepository;
         this.pazienteRepository = pazienteRepository;
+        this.medicinaleRepository = medicinaleRepository;
+        this.magazineRepository = magazineRepository;
     }
     @Transactional
     public String creaReparto(String repartoNome) {
@@ -200,6 +201,45 @@ public class AdminService {
     }
 
 
+    @Transactional
+    public String aggiungiFarmaco(Map<String, Object> payload) {
+        String nome = (String) payload.get("nome");
+        Integer quantita = (Integer) payload.get("quantita");
+        Integer availableQuantity = (Integer) payload.get("availableQuantity");
+        Integer puntoRiordino = (Integer) payload.get("puntoRiordino");
+        String scadenza = (String) payload.get("scadenza");
+        String categoria = (String) payload.get("categoria");
+        String descrizione = (String) payload.get("descrizione");
+        Long departmentId = payload.get("departmentId") != null ? Long.valueOf(payload.get("departmentId").toString()) : null;
+        Long magazineId = payload.get("magazineId") != null ? Long.valueOf(payload.get("magazineId").toString()) : null;
 
+        if (nome == null || nome.isEmpty() || quantita == null || quantita <= 0) {
+            throw new IllegalArgumentException("Nome del farmaco e quantità devono essere validi.");
+        }
+
+        Medicinale nuovoFarmaco = new Medicinale();
+        nuovoFarmaco.setNome(nome);
+        nuovoFarmaco.setQuantita(quantita);
+        nuovoFarmaco.setAvailableQuantity(availableQuantity);
+        nuovoFarmaco.setPuntoRiordino(puntoRiordino);
+        nuovoFarmaco.setScadenza(scadenza);
+        nuovoFarmaco.setCategoria(categoria);
+        nuovoFarmaco.setDescrizione(descrizione);
+
+        if (departmentId != null) {
+            Department department = departmentRepository.findById(departmentId)
+                    .orElseThrow(() -> new IllegalArgumentException("Dipartimento non trovato"));
+            nuovoFarmaco.setDepartment(department);
+        }
+
+        if (magazineId != null) {
+            Magazine magazine = magazineRepository.findById(magazineId)
+                    .orElseThrow(() -> new IllegalArgumentException("Magazzino non trovato"));
+            nuovoFarmaco.setMagazine(magazine);
+        }
+
+        medicinaleRepository.save(nuovoFarmaco);
+        return "Farmaco aggiunto con successo!";
+    }
 
 }

@@ -2,8 +2,10 @@ package hospitalApplication.controller;
 
 import hospitalApplication.models.Department;
 import hospitalApplication.models.DoctorDTO;
+import hospitalApplication.models.Magazine;
 import hospitalApplication.models.Utente;
 import hospitalApplication.repository.DepartmentRepository;
+import hospitalApplication.repository.MagazineRepository;
 import hospitalApplication.repository.UtenteRepository;
 import hospitalApplication.service.AdminService;
 import hospitalApplication.service.KeycloakService;
@@ -24,12 +26,14 @@ public class AdminController {
     private final DepartmentRepository departmentRepository;
     private final UtenteRepository utenteRepository;
     private final KeycloakService keycloakService;
+    private final MagazineRepository magazineRepository;
 
-    public AdminController(AdminService adminService, DepartmentRepository departmentRepository, UtenteRepository utenteRepository, KeycloakService keycloakService) {
+    public AdminController(AdminService adminService, DepartmentRepository departmentRepository, UtenteRepository utenteRepository, KeycloakService keycloakService, MagazineRepository magazineRepository) {
         this.adminService = adminService;
         this.departmentRepository = departmentRepository;
         this.utenteRepository = utenteRepository;
         this.keycloakService = keycloakService;
+        this.magazineRepository = magazineRepository;
     }
 
 
@@ -211,6 +215,18 @@ public class AdminController {
     }
 
 
+
+    @PostMapping("/aggiungi-farmaco")
+    public ResponseEntity<Map<String, String>> aggiungiFarmaco(@RequestBody Map<String, Object> payload) {
+        String result = adminService.aggiungiFarmaco(payload);
+        return ResponseEntity.ok(Map.of("message", result));
+    }
+
+    @GetMapping("/magazzini")
+    public ResponseEntity<List<Magazine>> getAllMagazzini() {
+        List<Magazine> magazzini = magazineRepository.findAll();
+        return ResponseEntity.ok(magazzini);
+    }
 
 
 }

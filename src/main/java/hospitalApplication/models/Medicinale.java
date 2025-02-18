@@ -28,12 +28,13 @@ public class Medicinale {
     private int availableQuantity;
 
 
+
     @ManyToOne
-    @JoinColumn(name = "department_id", nullable = true)
+    @JoinColumn(name = "department_id")
     private Department department;
 
     @ManyToOne
-    @JoinColumn(name = "magazine_id", nullable = true)
+    @JoinColumn(name = "magazine_id")
     private Magazine magazine;
 
 }
