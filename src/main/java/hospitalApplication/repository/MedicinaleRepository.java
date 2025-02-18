@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -20,7 +21,8 @@ public interface MedicinaleRepository extends JpaRepository<Medicinale, Long> {
 
     Optional<Medicinale> findByNome(String nomeMedicinale);
 
-
+    @Query("SELECT m.department.nome AS reparto, SUM(m.quantita) AS consumo FROM Medicinale m GROUP BY m.department.nome")
+    List<Map<String, Object>> findConsumoPerReparto();
     @Modifying
     @Transactional
     @Query("UPDATE Medicinale m SET m.availableQuantity = :newAvailableQuantity WHERE m.id = :medicinaleId")

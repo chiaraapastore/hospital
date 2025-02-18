@@ -20,16 +20,18 @@ public class AdminService {
     private final PazienteRepository pazienteRepository;
     private final MedicinaleRepository medicinaleRepository;
     private final MagazineRepository magazineRepository;
+    private final OrdineRepository ordineRepository;
 
     private final AuthenticationService authenticationService;
 
-    public AdminService(UtenteRepository utenteRepository, DepartmentRepository departmentRepository, AuthenticationService authenticationService, PazienteRepository pazienteRepository, MedicinaleRepository medicinaleRepository, MagazineRepository magazineRepository) {
+    public AdminService(UtenteRepository utenteRepository, DepartmentRepository departmentRepository, AuthenticationService authenticationService, PazienteRepository pazienteRepository, MedicinaleRepository medicinaleRepository, OrdineRepository ordineRepository,MagazineRepository magazineRepository) {
         this.departmentRepository = departmentRepository;
         this.authenticationService = authenticationService;
         this.utenteRepository = utenteRepository;
         this.pazienteRepository = pazienteRepository;
         this.medicinaleRepository = medicinaleRepository;
         this.magazineRepository = magazineRepository;
+        this.ordineRepository = ordineRepository;
     }
     @Transactional
     public String creaReparto(String repartoNome) {
@@ -240,6 +242,36 @@ public class AdminService {
 
         medicinaleRepository.save(nuovoFarmaco);
         return "Farmaco aggiunto con successo!";
+    }
+
+    @Transactional
+    public List<Medicinale> getEmergenze() {
+        return medicinaleRepository.findAll()
+                .stream()
+                .filter(m -> m.getAvailableQuantity() <= m.getPuntoRiordino())
+                .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public List<Ordine> getOrdini() {
+        return ordineRepository.findAll();
+    }
+
+
+    @Transactional
+    public String creaOrdine(Ordine ordine) {
+        if (ordine.getMateriale() == null || ordine.getQuantita() <= 0 || ordine.getFornitore() == null) {
+            throw new IllegalArgumentException("Dati ordine non validi");
+        }
+        ordineRepository.save(ordine);
+        return "Ordine creato con successo per " + ordine.getMateriale();
+    }
+
+
+    @Transactional
+    public List<Map<String, Object>> getReportConsumi() {
+        return medicinaleRepository.findConsumoPerReparto();
     }
 
 }

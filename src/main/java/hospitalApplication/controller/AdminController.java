@@ -1,14 +1,12 @@
 package hospitalApplication.controller;
 
-import hospitalApplication.models.Department;
-import hospitalApplication.models.DoctorDTO;
-import hospitalApplication.models.Magazine;
-import hospitalApplication.models.Utente;
+import hospitalApplication.models.*;
 import hospitalApplication.repository.DepartmentRepository;
 import hospitalApplication.repository.MagazineRepository;
 import hospitalApplication.repository.UtenteRepository;
 import hospitalApplication.service.AdminService;
 import hospitalApplication.service.KeycloakService;
+import hospitalApplication.service.OrdineService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +25,15 @@ public class AdminController {
     private final UtenteRepository utenteRepository;
     private final KeycloakService keycloakService;
     private final MagazineRepository magazineRepository;
+    private final OrdineService ordineService;
 
-    public AdminController(AdminService adminService, DepartmentRepository departmentRepository, UtenteRepository utenteRepository, KeycloakService keycloakService, MagazineRepository magazineRepository) {
+    public AdminController(AdminService adminService, DepartmentRepository departmentRepository, UtenteRepository utenteRepository, KeycloakService keycloakService, OrdineService ordineService,MagazineRepository magazineRepository) {
         this.adminService = adminService;
         this.departmentRepository = departmentRepository;
         this.utenteRepository = utenteRepository;
         this.keycloakService = keycloakService;
         this.magazineRepository = magazineRepository;
+        this.ordineService = ordineService;
     }
 
 
@@ -228,6 +228,46 @@ public class AdminController {
         return ResponseEntity.ok(magazzini);
     }
 
+    @GetMapping("/emergenze")
+    public ResponseEntity<List<Medicinale>> getEmergenze() {
+        return ResponseEntity.ok(adminService.getEmergenze());
+    }
+
+
+    @GetMapping("/ordini")
+    public ResponseEntity<List<Ordine>> getOrdini() {
+        return ResponseEntity.ok(adminService.getOrdini());
+    }
+
+
+    @GetMapping("/report-consumi")
+    public ResponseEntity<List<Map<String, Object>>> getReportConsumi() {
+        return ResponseEntity.ok(adminService.getReportConsumi());
+    }
+
+    @PostMapping("/ordini")
+    public ResponseEntity<Ordine> creaOrdine(@RequestBody Ordine ordine) {
+        Ordine nuovoOrdine = ordineService.creaOrdine(ordine.getFornitore(), ordine.getMateriale(), ordine.getQuantita());
+        return ResponseEntity.ok(nuovoOrdine);
+    }
+
+
+
+    @GetMapping("/storico-ordini")
+    public List<Ordine> getStoricoOrdini() {
+        return ordineService.getStoricoOrdini();
+    }
+
+    @GetMapping("/ordini-in-attesa")
+    public List<Ordine> getOrdiniInAttesa() {
+        return ordineService.getOrdiniInAttesa();
+    }
+
+    @PutMapping("/ordini/{ordineId}/stato")
+    public Ordine aggiornaStatoOrdine(@PathVariable Long ordineId, @RequestBody Map<String, String> payload) {
+        StatoOrdine nuovoStato = StatoOrdine.valueOf(payload.get("stato"));
+        return ordineService.aggiornaStatoOrdine(ordineId, nuovoStato);
+    }
 
 }
 
