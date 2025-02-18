@@ -43,7 +43,7 @@ public class Utente {
 
 
     @ManyToOne
-    @JoinColumn(name = "reparto_id")
+    @JoinColumn(name = "reparto_id", referencedColumnName = "id")
     @JsonBackReference
     @ToString.Exclude
     private Department reparto;

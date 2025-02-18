@@ -109,23 +109,20 @@ public class AdminService {
     }
 
     @Transactional
-    public String assegnaDottoreAReparto(Long utenteId, Long repartoId) {
+    public void assegnaDottoreAReparto(Long utenteId, Long repartoId) {
         Utente utente = utenteRepository.findById(utenteId)
-                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato con ID: " + utenteId));
-
-        if (!utente.getRole().equals("dottore")) {
-            throw new IllegalArgumentException("L'utente con ID " + utenteId + " non è un dottore.");
-        }
+                .orElseThrow(() -> new IllegalArgumentException("Dottore non trovato con ID: " + utenteId));
 
         Department reparto = departmentRepository.findById(repartoId)
                 .orElseThrow(() -> new IllegalArgumentException("Reparto non trovato con ID: " + repartoId));
 
-        utente.setReparto(reparto);
+        utenteRepository.aggiornaReparto(utenteId, reparto);
+        utenteRepository.flush();
 
-        utenteRepository.save(utente);
-
-        return "Dottore con ID " + utenteId + " assegnato al reparto " + reparto.getNome();
+        System.out.println("Dottore aggiornato a reparto: " + reparto.getNome());
     }
+
+
 
     @Transactional
     public List<DoctorDTO> getAllDottori() {
@@ -169,12 +166,13 @@ public class AdminService {
 
     @Transactional
     public String creaDottore(String firstName, String lastName, String email, String repartoNome) {
-        Department reparto = departmentRepository.findFirstByNome(repartoNome)
-                .orElseGet(() -> {
-                    Department newReparto = new Department();
-                    newReparto.setNome(repartoNome);
-                    return departmentRepository.save(newReparto);
-                });
+        Optional<Department> repartoOpt = departmentRepository.findFirstByNome(repartoNome);
+
+        if (repartoOpt.isEmpty()) {
+            throw new IllegalArgumentException("Errore: Il reparto specificato non esiste nel database.");
+        }
+
+        Department reparto = repartoOpt.get();
 
         Utente dottore = new Utente();
         dottore.setFirstName(firstName);
@@ -187,6 +185,8 @@ public class AdminService {
         return "Dottore creato con successo e assegnato al reparto " + reparto.getNome();
     }
 
+
+
     @Transactional
     public String creaCapoReparto(String firstName, String lastName, String email, Department reparto) {
         Utente capoReparto = new Utente();
@@ -195,7 +195,6 @@ public class AdminService {
         capoReparto.setEmail(email);
         capoReparto.setRole("capoReparto");
         capoReparto.setReparto(reparto);
-
         utenteRepository.save(capoReparto);
         return "Capo Reparto creato con successo e assegnato al reparto " + reparto.getNome();
     }
