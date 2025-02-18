@@ -1,7 +1,6 @@
 package hospitalApplication.repository;
 
 import feign.Param;
-import hospitalApplication.models.Department;
 import hospitalApplication.models.Medicinale;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +26,6 @@ public interface MedicinaleRepository extends JpaRepository<Medicinale, Long> {
     @Transactional
     @Query("UPDATE Medicinale m SET m.availableQuantity = :newAvailableQuantity WHERE m.id = :medicinaleId")
     int updateAvailableQuantity(@Param("medicinaleId") Long medicinaleId, @Param("newAvailableQuantity") int newAvailableQuantity);
+
+    List<Medicinale> findByQuantitaLessThanEqual(int quantita);
 }

@@ -12,4 +12,5 @@ import java.util.List;
 @Repository
 public interface SomministrazioneRepository extends JpaRepository<Somministrazione, String> {
     List<Somministrazione> findByPaziente(Paziente paziente);
+    List<Somministrazione> findAll();
 }
