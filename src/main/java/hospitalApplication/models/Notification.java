@@ -18,7 +18,6 @@ public class Notification {
     private boolean letta;
     private LocalDateTime dataOra;
     private String type;
-    private LocalDateTime readNotification;
     private String destinatario;
     private String recipient;
 

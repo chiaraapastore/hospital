@@ -21,57 +21,52 @@ public class HeadOfDepartmentService {
     private MedicinaleRepository medicinaleRepository;
     private final AuthenticationService authenticationService;
     private final UtenteRepository utenteRepository;
+    private final NotificationService notificationService;
     private final DepartmentRepository departmentRepository;
 
-    public HeadOfDepartmentService(MedicinaleRepository medicinaleRepository, UtenteRepository utenteRepository, AuthenticationService authenticationService, DepartmentRepository departmentRepository) {
+    public HeadOfDepartmentService(MedicinaleRepository medicinaleRepository, UtenteRepository utenteRepository, AuthenticationService authenticationService, DepartmentRepository departmentRepository, NotificationService notificationService) {
         this.medicinaleRepository = medicinaleRepository;
         this.authenticationService = authenticationService;
         this.utenteRepository = utenteRepository;
         this.departmentRepository = departmentRepository;
+        this.notificationService = notificationService;
     }
-
-
-    @Transactional
-    public String inviaNotifica(String repartoId, String messaggio) {
-        Utente utente = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (utente == null) {
-            throw new IllegalArgumentException("Utente non trovato");
-        }
-
-        System.out.println("Inviata notifica: " + messaggio);
-
-        return "{\"status\": \"success\", \"message\": \"Notifica inviata al reparto " + repartoId + ": " + messaggio + "\"}";
-    }
-
 
 
     @Transactional
     public void cambiaReparto(Long doctorId, Long nuovoRepartoId) {
+        Utente user = getAuthenticatedUser();
         Utente dottore = utenteRepository.findById(doctorId).orElseThrow(() -> new IllegalArgumentException("Dottore non trovato"));
         Department reparto = departmentRepository.findById(nuovoRepartoId).orElseThrow(() -> new IllegalArgumentException("Reparto non trovato"));
         dottore.setReparto(reparto);
         utenteRepository.save(dottore);
+        notificationService.notifyDepartmentChange(dottore, reparto.getNome(), user);
     }
 
     @Transactional
     public void assegnaFerie(Long doctorId, Date dataFerie) {
+        Utente user = getAuthenticatedUser();
         Utente dottore = utenteRepository.findById(doctorId)
                 .orElseThrow(() -> new IllegalArgumentException("Dottore non trovato"));
         dottore.setFerie(dataFerie);
         utenteRepository.save(dottore);
+        notificationService.sendNotification(user, "Ferie assegnate a " + dottore.getFirstName(), "ferie_assignment");
     }
 
 
     @Transactional
     public void assegnaTurno(Long doctorId, String turno) {
+        Utente user = getAuthenticatedUser();
         Utente dottore = utenteRepository.findById(doctorId).orElseThrow(() -> new IllegalArgumentException("Dottore non trovato"));
         dottore.setTurno(turno);
+        notificationService.notifyNewPatient(dottore, user, "Assegnazione turno");
         utenteRepository.save(dottore);
     }
 
 
     @Transactional(readOnly = true)
     public List<Department> getReparti() {
+        getAuthenticatedUser();
         return departmentRepository.findAll();
     }
 
@@ -86,6 +81,7 @@ public class HeadOfDepartmentService {
 
     @Transactional
     public String aggiungiMedicinale(Medicinale medicinale) {
+        getAuthenticatedUser();
         Department reparto = departmentRepository.findById(medicinale.getDepartment().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Reparto non trovato"));
 
@@ -98,4 +94,12 @@ public class HeadOfDepartmentService {
         return "Medicinale " + medicinale.getNome() + " aggiunto con successo al reparto " + reparto.getNome();
     }
 
+
+    private Utente getAuthenticatedUser() {
+        Utente user = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (user == null) {
+            throw new IllegalArgumentException("Utente non autenticato");
+        }
+        return user;
+    }
 }

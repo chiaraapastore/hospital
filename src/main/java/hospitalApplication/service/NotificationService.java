@@ -26,47 +26,42 @@ public class NotificationService {
 
     @Transactional
     public void sendWelcomeNotification(Utente newUser) {
-        Utente sender = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (sender == null) {
-            throw new IllegalArgumentException("Utente non autenticato");
-        }
+        Utente sender = getAuthenticatedUser();
         String message = "Benvenuto, " + newUser.getFirstName() + "! Sei stato registrato come " + newUser.getRole() + ".";
         createAndSendNotification(sender, newUser, message, "welcome");
     }
 
     @Transactional
     public void notifyNewPatient(Utente doctor, Utente chief, String patientName) {
-        Utente sender = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (sender == null) {
-            throw new IllegalArgumentException("Utente non autenticato");
-        }
+        Utente sender = getAuthenticatedUser();
         String message = "Un nuovo paziente, " + patientName + ", è stato assegnato al reparto.";
         createAndSendNotification(sender, doctor, message, "new_patient");
-        createAndSendNotification(sender, chief, message, "new_patient");
+        if (chief != null) {
+            createAndSendNotification(sender, chief, message, "new_patient");
+        }
     }
 
     @Transactional
     public void notifyDepartmentChange(Utente user, String newDepartmentName, Utente chief) {
-        Utente sender = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (sender == null) {
-            throw new IllegalArgumentException("Utente non trovato");
-        }
-
+        Utente sender = getAuthenticatedUser();
         String message = "Sei stato spostato in un nuovo reparto! Ora fai parte del reparto " + newDepartmentName + ".";
         createAndSendNotification(sender, user, message, "department_change");
-
         if (chief != null) {
             String chiefMessage = user.getFirstName() + " " + user.getLastName() + " è stato spostato nel reparto " + newDepartmentName + ".";
             createAndSendNotification(sender, chief, chiefMessage, "department_change");
         }
     }
 
-    void createAndSendNotification(Utente sender, Utente receiver, String message, String type) {
+    @Transactional
+    public void sendNotification(Utente receiver, String message, String type) {
+        Utente sender = getAuthenticatedUser();
+        createAndSendNotification(sender, receiver, message, type);
+    }
+
+    private void createAndSendNotification(Utente sender, Utente receiver, String message, String type) {
         if (receiver == null) {
-            System.err.println("Errore: il destinatario della notifica è null. Notifica non inviata.");
             return;
         }
-
         Notification notification = new Notification();
         notification.setMessaggio(message);
         notification.setSender(sender);
@@ -75,76 +70,59 @@ public class NotificationService {
         notification.setType(type);
         notification.setLetta(false);
         notificationRepository.save(notification);
-
         receiver.setCountNotification(receiver.getCountNotification() + 1);
         utenteRepository.save(receiver);
     }
 
-
     @Transactional
-    public void markNotificationAsRead(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new RuntimeException("Notifica non trovata"));
-
-        if (!notification.isLetta()) {
-            notification.setLetta(true);
-            notification.setReadNotification(LocalDateTime.now());
-            notificationRepository.save(notification);
-
-            Utente receiver = notification.getReceiver();
-            int newCount = Math.max(0, receiver.getCountNotification() - 1);
-            receiver.setCountNotification(newCount);
-            utenteRepository.save(receiver);
-        }
-    }
-
-    @Transactional
-    public void markAllNotificationsAsReadForUser(Utente user) {
+    public void markAllNotificationsAsRead() {
+        Utente user = getAuthenticatedUser();
         List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndLettaFalse(user.getId());
-
         if (!unreadNotifications.isEmpty()) {
-            unreadNotifications.forEach(notification -> {
-                notification.setLetta(true);
-                notification.setReadNotification(LocalDateTime.now());
-            });
+            unreadNotifications.forEach(notification -> notification.setLetta(false));
             notificationRepository.saveAll(unreadNotifications);
-
             user.setCountNotification(0);
             utenteRepository.save(user);
         }
     }
 
     @Transactional
-    public List<Notification> getUserNotifications(Utente user) {
+    public void sendNotificationAdmin(Long adminId, String message) {
+        Utente sender = getAuthenticatedUser();
+        Utente admin = utenteRepository.findById(adminId)
+                .orElseThrow(() -> new IllegalArgumentException("Amministratore non trovato"));
+        createAndSendNotification(sender, admin, message, "admin_notification");
+    }
+
+    @Transactional
+    public void sendNotificationCapoReparto(Long chiefId, String message) {
+        Utente sender = getAuthenticatedUser();
+        Utente chief = utenteRepository.findById(chiefId)
+                .orElseThrow(() -> new IllegalArgumentException("Capo reparto non trovato"));
+        createAndSendNotification(sender, chief, message, "capo_reparto_notification");
+    }
+
+    @Transactional
+    public List<Notification> getUserNotifications() {
+        Utente user = getAuthenticatedUser();
         return notificationRepository.findByReceiverId(user.getId());
     }
 
-    @Transactional
-    public Utente getUserById(Long userId) {
-        return utenteRepository.findById(userId)
-                .orElse(null);
+    private Utente getAuthenticatedUser() {
+        Utente user = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (user == null) {
+            throw new IllegalArgumentException("Utente non autenticato");
+        }
+        return user;
     }
 
-    public void sendNotification(Notification notification) {
-        System.out.println("NOTIFICA INVIATA:");
-        System.out.println("Destinatario: " + notification.getDestinatario());
-        System.out.println("Messaggio: " + notification.getMessaggio());
+    public Utente getUserById(Long userId) {
+        return utenteRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
     }
 
     public List<Notification> getNotificationsFromDoctors(Utente chief) {
-        return notificationRepository.findByRecipientAndSenderRole(chief, "DOCTOR");
+        return notificationRepository.findByRecipientAndSenderRole(chief, "dottore");
     }
-
-    @Transactional
-    public void sendNotification(String admin, String reportMessage) {
-        Notification notification = new Notification();
-        notification.setDestinatario(admin);
-        notification.setMessaggio(reportMessage);
-        notification.setLetta(false);
-        notificationRepository.save(notification);
-
-        System.out.println("Notifica salvata per " + admin + ": " + reportMessage);
-    }
-
 
 }

@@ -33,6 +33,18 @@ public class NotificationController {
         }
     }
 
+    @PostMapping("/send-admin")
+    public ResponseEntity<String> sendNotificationAdmin(@RequestParam Long adminId, @RequestParam String message) {
+        notificationService.sendNotificationAdmin(adminId, message);
+        return ResponseEntity.ok("Notifica inviata all'amministratore.");
+    }
+
+    @PostMapping("/send-capo-reparto")
+    public ResponseEntity<String> sendNotificationCapoReparto(@RequestParam Long chiefId, @RequestParam String message) {
+        notificationService.sendNotificationCapoReparto(chiefId, message);
+        return ResponseEntity.ok("Notifica inviata al capo reparto.");
+    }
+
     @PostMapping("/new-patient")
     public ResponseEntity<Void> notifyNewPatient(@RequestParam Long doctorId, @RequestParam Long chiefId, @RequestParam String patientName) {
         Utente doctor = notificationService.getUserById(doctorId);
@@ -49,29 +61,25 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/mark-read/{notificationId}")
-    public ResponseEntity<Void> markNotificationAsRead(@PathVariable Long notificationId) {
-        notificationService.markNotificationAsRead(notificationId);
+    @PutMapping("/mark-all-read")
+    public ResponseEntity<Void> markAllNotificationsAsRead() {
+        notificationService.markAllNotificationsAsRead();
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/mark-all-read/{userId}")
-    public ResponseEntity<Void> markAllNotificationsAsReadForUser(@PathVariable Long userId) {
-        Utente user = notificationService.getUserById(userId);
-        notificationService.markAllNotificationsAsReadForUser(user);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Long userId) {
-        Utente user = notificationService.getUserById(userId);
-        List<Notification> notifications = notificationService.getUserNotifications(user);
+    @GetMapping("/user/notifications")
+    public ResponseEntity<List<Notification>> getUserNotifications() {
+        List<Notification> notifications = notificationService.getUserNotifications();
         return ResponseEntity.ok(notifications);
     }
 
     @PostMapping("/send")
-    public ResponseEntity<String> sendNotification(@RequestBody Notification notification) {
-        notificationService.sendNotification(notification);
+    public ResponseEntity<String> sendNotification(@RequestParam Long receiverId, @RequestParam String message, @RequestParam String type) {
+        Utente receiver = notificationService.getUserById(receiverId);
+        if (receiver == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Destinatario non trovato.");
+        }
+        notificationService.sendNotification(receiver, message, type);
         return ResponseEntity.ok("Notifica inviata con successo.");
     }
 
