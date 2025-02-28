@@ -85,11 +85,6 @@ public class DoctorService {
     }
 
 
-    @Transactional
-    public List<Somministrazione> getSomministrazioniByPaziente(Long pazienteId) {
-        return somministrazioneRepository.findByPazienteId(pazienteId);
-    }
-
 
     @Transactional
     public List<Paziente> getPazientiDelDottore() {
