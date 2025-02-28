@@ -26,7 +26,7 @@ public class Somministrazione {
     private Utente utente;
 
     @ManyToOne
-    @JoinColumn(name = "paziente_id", nullable = true)
+    @JoinColumn(name = "paziente_id", nullable = false)
     private Paziente paziente;
 
 

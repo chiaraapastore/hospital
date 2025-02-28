@@ -1,15 +1,12 @@
 package hospitalApplication.service;
 
 import hospitalApplication.config.AuthenticationService;
-import hospitalApplication.models.Department;
-import hospitalApplication.models.Medicinale;
-import hospitalApplication.models.Utente;
-import hospitalApplication.repository.DepartmentRepository;
-import hospitalApplication.repository.MedicinaleRepository;
-import hospitalApplication.repository.UtenteRepository;
+import hospitalApplication.models.*;
+import hospitalApplication.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.Optional;
 @Service
 
 public class HeadOfDepartmentService {
+
     private MedicinaleRepository medicinaleRepository;
     private final AuthenticationService authenticationService;
     private final UtenteRepository utenteRepository;
@@ -43,25 +41,6 @@ public class HeadOfDepartmentService {
         notificationService.notifyDepartmentChange(dottore, reparto.getNome(), user);
     }
 
-    @Transactional
-    public void assegnaFerie(Long doctorId, Date dataFerie) {
-        Utente user = getAuthenticatedUser();
-        Utente dottore = utenteRepository.findById(doctorId)
-                .orElseThrow(() -> new IllegalArgumentException("Dottore non trovato"));
-        dottore.setFerie(dataFerie);
-        utenteRepository.save(dottore);
-        notificationService.sendNotification(user, "Ferie assegnate a " + dottore.getFirstName(), "ferie_assignment");
-    }
-
-
-    @Transactional
-    public void assegnaTurno(Long doctorId, String turno) {
-        Utente user = getAuthenticatedUser();
-        Utente dottore = utenteRepository.findById(doctorId).orElseThrow(() -> new IllegalArgumentException("Dottore non trovato"));
-        dottore.setTurno(turno);
-        notificationService.notifyNewPatient(dottore, user, "Assegnazione turno");
-        utenteRepository.save(dottore);
-    }
 
 
     @Transactional(readOnly = true)

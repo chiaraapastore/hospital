@@ -1,6 +1,7 @@
 package hospitalApplication.controller;
 
 import com.itextpdf.text.DocumentException;
+import hospitalApplication.models.Department;
 import hospitalApplication.models.Paziente;
 import hospitalApplication.service.AdminService;
 import hospitalApplication.service.DoctorService;
@@ -32,6 +33,13 @@ public class PazienteController {
         List<Paziente> pazienti = pazienteService.getAllPazienti();
         return ResponseEntity.ok(pazienti);
     }
+
+    @GetMapping("/{pazienteId}/reparto")
+    public ResponseEntity<Department> getRepartoByPaziente(@PathVariable Long pazienteId) throws Exception {
+        Department reparto = pazienteService.getRepartoByPaziente(pazienteId);
+        return ResponseEntity.ok(reparto);
+    }
+
 
     @GetMapping("/search/{id}")
     public ResponseEntity<Paziente> getPazienteById(@PathVariable Long id) {

@@ -1,6 +1,7 @@
 package hospitalApplication.repository;
 
 import feign.Param;
+import hospitalApplication.models.Department;
 import hospitalApplication.models.Paziente;
 import hospitalApplication.models.Utente;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,7 @@ public interface PazienteRepository extends JpaRepository<Paziente, Long> {
     Optional<Paziente> findByIdWithFarmaciSomministrati(@Param("id") Long id);
 
     Paziente findFirstByOrderByIdAsc();
+
+    @Query("SELECT p.reparto FROM Paziente p WHERE p.id = :pazienteId")
+    Optional<Department> findRepartoByPazienteId(@Param("pazienteId") Long pazienteId);
 }

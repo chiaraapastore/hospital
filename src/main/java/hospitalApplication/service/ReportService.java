@@ -78,7 +78,7 @@ public class ReportService {
             return;
         }
 
-        String reportMessage = "📦 Report Magazzino\n" +
+        String reportMessage = " Report Magazzino\n" +
                 "Stock Disponibile: " + magazine.getStockDisponibile() + "\n" +
                 "Capienza Massima: " + magazine.getCapienzaMassima() + "\n" +
                 (magazine.getStockDisponibile() < magazine.getPuntoRiordino() ? " Scorte sotto il punto di riordino!" : "Scorte sufficienti.");
@@ -92,7 +92,7 @@ public class ReportService {
 
         Utente adminUser = utenteRepository.findByUsername("admin");
         if (adminUser != null) {
-            notificationService.createAndSendNotification(utente, adminUser, reportMessage, "stock_report");
+
             System.out.println("Report inviato all'admin: \n" + reportMessage);
         } else {
             System.err.println("Errore: Utente admin non trovato! Notifica non inviata.");

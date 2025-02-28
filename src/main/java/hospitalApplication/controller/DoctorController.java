@@ -1,8 +1,6 @@
 package hospitalApplication.controller;
 
-import hospitalApplication.models.DoctorDTO;
-import hospitalApplication.models.Medicinale;
-import hospitalApplication.models.Paziente;
+import hospitalApplication.models.*;
 import hospitalApplication.repository.MedicinaleRepository;
 import hospitalApplication.repository.PazienteRepository;
 import hospitalApplication.service.DoctorService;
@@ -41,13 +39,34 @@ public class DoctorController {
 
 
     @PostMapping("/somministra-medicine")
-    public ResponseEntity<String> somministraMedicine(@RequestParam Long pazienteId,
-                                                      @RequestParam String nomeMedicinale,
-                                                      @RequestParam int quantita) {
-        String response = doctorService.somministraMedicine(pazienteId, nomeMedicinale, quantita);
+    public ResponseEntity<Somministrazione> somministraMedicine(@RequestBody SomministrazioneRequest request) {
+        System.out.println("Richiesta ricevuta:");
+        System.out.println("Paziente ID: " + request.getPazienteId());
+        System.out.println("Capo Reparto ID: " + request.getCapoRepartoId());
+        System.out.println("Nome Medicinale: " + request.getNomeMedicinale());
+        System.out.println("Quantità: " + request.getQuantita());
+
+        Somministrazione response = doctorService.somministraMedicine(
+                request.getPazienteId(),
+                request.getCapoRepartoId(),
+                request.getNomeMedicinale(),
+                request.getQuantita()
+        );
+
+        System.out.println("Somministrazione effettuata con successo!");
         return ResponseEntity.ok(response);
     }
 
+
+
+
+
+
+    @PostMapping("/scadenza")
+    public ResponseEntity<?> scadenzaFarmaco( @PathVariable Long capoRepartoId, @PathVariable Long idMedicinale) {
+        doctorService.scadenzaFarmaco(capoRepartoId, idMedicinale);
+        return ResponseEntity.ok("notifica_inviata");
+    }
 
     @GetMapping("/pazienti")
     public ResponseEntity<List<Paziente>> getPazienti() {
@@ -67,6 +86,11 @@ public class DoctorController {
         return ResponseEntity.ok(dottori);
     }
 
+    @GetMapping("/{emailDottore}/reparto")
+    public ResponseEntity<Department> getRepartoByDottore(@PathVariable String emailDottore) {
+        Department reparto = doctorService.getRepartoByDottore(emailDottore);
+        return ResponseEntity.ok(reparto);
+    }
 
     @PutMapping("/cambia-reparto/{doctorId}/{nuovoRepartoId}")
     public ResponseEntity<String> cambiaReparto(@PathVariable Long doctorId, @PathVariable Long nuovoRepartoId) {
@@ -74,11 +98,6 @@ public class DoctorController {
         return ResponseEntity.ok("Reparto cambiato con successo");
     }
 
-    @PutMapping("/assegna-turno/{doctorId}")
-    public ResponseEntity<String> assegnaTurno(@PathVariable Long doctorId, @RequestParam String turno) {
-        headOfDepartmentService.assegnaTurno(doctorId, turno);
-        return ResponseEntity.ok("Turno assegnato con successo");
-    }
 
 
 

@@ -5,12 +5,14 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import hospitalApplication.config.AuthenticationService;
+import hospitalApplication.models.Department;
 import hospitalApplication.models.Paziente;
 import hospitalApplication.models.Somministrazione;
 import hospitalApplication.models.Utente;
 import hospitalApplication.repository.DepartmentRepository;
 import hospitalApplication.repository.PazienteRepository;
 import hospitalApplication.repository.UtenteRepository;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -171,4 +173,15 @@ public class PazienteService {
         table.addCell(h1);
         table.addCell(h2);
     }
+
+    public Department getRepartoByPaziente(Long pazienteId) throws Exception {
+        try {
+            return pazienteRepository.findRepartoByPazienteId(pazienteId)
+                    .orElseThrow(() -> new NotFoundException("Reparto non trovato per il paziente con ID: " + pazienteId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Errore nel recupero del reparto per il paziente con ID: " + pazienteId, e);
+        }
+    }
+
 }

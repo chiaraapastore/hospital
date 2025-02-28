@@ -23,8 +23,9 @@ public class AdminService {
     private final OrdineRepository ordineRepository;
 
     private final AuthenticationService authenticationService;
+    private final NotificationService notificationService;
 
-    public AdminService(UtenteRepository utenteRepository, DepartmentRepository departmentRepository, AuthenticationService authenticationService, PazienteRepository pazienteRepository, MedicinaleRepository medicinaleRepository, OrdineRepository ordineRepository,MagazineRepository magazineRepository) {
+    public AdminService(UtenteRepository utenteRepository, DepartmentRepository departmentRepository, AuthenticationService authenticationService, PazienteRepository pazienteRepository, MedicinaleRepository medicinaleRepository, OrdineRepository ordineRepository, MagazineRepository magazineRepository, NotificationService notificationService) {
         this.departmentRepository = departmentRepository;
         this.authenticationService = authenticationService;
         this.utenteRepository = utenteRepository;
@@ -32,6 +33,7 @@ public class AdminService {
         this.medicinaleRepository = medicinaleRepository;
         this.magazineRepository = magazineRepository;
         this.ordineRepository = ordineRepository;
+        this.notificationService = notificationService;
     }
     @Transactional
     public String creaReparto(String repartoNome) {
@@ -51,8 +53,8 @@ public class AdminService {
     @Transactional
     public String aggiungiDottoreAReparto(Long utenteId, Long repartoId) {
 
-        Utente utenteAutenticato = utenteRepository.findByUsername(authenticationService.getUsername());
-        if (utenteAutenticato == null) {
+        Utente utenteAdmin = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (utenteAdmin == null) {
             throw new IllegalArgumentException("Utente non autenticato");
         }
 
@@ -69,7 +71,7 @@ public class AdminService {
         dottore.setReparto(reparto);
 
         utenteRepository.save(dottore);
-
+        notificationService.sendNotificationAssignToDepartment(utenteAdmin, reparto.getNome());
         return "Dottore " + dottore.getFirstName() + " " + dottore.getLastName() + " assegnato al reparto " + reparto.getNome();
     }
 
@@ -78,13 +80,13 @@ public class AdminService {
         String authenticatedUsername = authenticationService.getUsername();
         System.out.println("Username autenticato: " + authenticatedUsername);
 
-        Utente authenticatedUser = utenteRepository.findByUsername(authenticatedUsername);
+        Utente utenteAdmin = utenteRepository.findByUsername(authenticatedUsername);
 
-        if (authenticatedUser == null) {
+        if (utenteAdmin == null) {
             throw new IllegalArgumentException("Utente autenticato non trovato nel database: " + authenticatedUsername);
         }
 
-        System.out.println("Utente autenticato trovato: " + authenticatedUser.getUsername());
+        System.out.println("Utente autenticato trovato: " + utenteAdmin.getUsername());
         System.out.println("Assegnazione capo reparto per: " + nomeUtente + " al reparto ID: " + repartoId);
 
         String[] parts = nomeUtente.split(" ");
@@ -107,7 +109,7 @@ public class AdminService {
         departmentRepository.save(reparto);
         utenteRepository.save(utente);
         departmentRepository.save(reparto);
-
+        notificationService.sendNotificationAssignToDepartment(utenteAdmin, reparto.getNome());
         return "Utente " + utente.getFirstName() + " " + utente.getLastName() + " assegnato come capo del reparto " + reparto.getNome();
     }
 
@@ -121,7 +123,7 @@ public class AdminService {
 
         utenteRepository.aggiornaReparto(utenteId, reparto);
         utenteRepository.flush();
-
+        notificationService.sendNotificationAssignToDepartment(utente,reparto.getNome());
         System.out.println("Dottore aggiornato a reparto: " + reparto.getNome());
     }
 
@@ -169,6 +171,11 @@ public class AdminService {
 
     @Transactional
     public String creaDottore(String firstName, String lastName, String email, String repartoNome) {
+        Utente utenteAdmin = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (utenteAdmin == null) {
+            throw new IllegalArgumentException("Utente non autenticato");
+        }
+
         Optional<Department> repartoOpt = departmentRepository.findFirstByNome(repartoNome);
 
         if (repartoOpt.isEmpty()) {
@@ -185,6 +192,7 @@ public class AdminService {
         dottore.setReparto(reparto);
 
         utenteRepository.save(dottore);
+        notificationService.sendWelcomeNotification(utenteAdmin,dottore);
         return "Dottore creato con successo e assegnato al reparto " + reparto.getNome();
     }
 
@@ -192,6 +200,10 @@ public class AdminService {
 
     @Transactional
     public String creaCapoReparto(String firstName, String lastName, String email, Department reparto) {
+        Utente utenteAdmin = utenteRepository.findByUsername(authenticationService.getUsername());
+        if (utenteAdmin == null) {
+            throw new IllegalArgumentException("Utente non autenticato");
+        }
         Utente capoReparto = new Utente();
         capoReparto.setFirstName(firstName);
         capoReparto.setLastName(lastName);
@@ -199,6 +211,7 @@ public class AdminService {
         capoReparto.setRole("capoReparto");
         capoReparto.setReparto(reparto);
         utenteRepository.save(capoReparto);
+        notificationService.sendWelcomeNotification(utenteAdmin, capoReparto);
         return "Capo Reparto creato con successo e assegnato al reparto " + reparto.getNome();
     }
 

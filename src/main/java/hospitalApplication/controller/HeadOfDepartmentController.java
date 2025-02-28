@@ -1,10 +1,13 @@
 package hospitalApplication.controller;
 
+import hospitalApplication.models.Ferie;
 import hospitalApplication.models.Medicinale;
+import hospitalApplication.models.Turni;
 import hospitalApplication.service.AdminService;
 import hospitalApplication.service.HeadOfDepartmentService;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,27 +29,6 @@ public class HeadOfDepartmentController {
     public HeadOfDepartmentController(HeadOfDepartmentService headOfDepartmentService, AdminService adminService) {
         this.headOfDepartmentService = headOfDepartmentService;
         this.adminService = adminService;
-    }
-
-
-    @PutMapping("/assegna-ferie/{doctorId}")
-    public ResponseEntity<Void> assegnaFerie(
-            @PathVariable Long doctorId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dataFerie) {
-        headOfDepartmentService.assegnaFerie(doctorId, dataFerie);
-        return ResponseEntity.ok().build();
-    }
-
-
-    @PostMapping("/notifica/{repartoId}")
-    public ResponseEntity<String> inviaNotifica(@PathVariable String repartoId, @RequestBody Map<String, String> payload) {
-        String messaggio = payload.get("messaggio");
-        if (messaggio == null || messaggio.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Messaggio non valido");
-        }
-
-        String response = headOfDepartmentService.inviaNotifica(repartoId, messaggio);
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/reparti")

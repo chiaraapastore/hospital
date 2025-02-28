@@ -22,7 +22,7 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     @Query("UPDATE Utente u SET u.reparto = :reparto WHERE u.id = :utenteId")
     void aggiornaReparto(@Param("utenteId") Long utenteId, @Param("reparto") Department reparto);
 
-
-
+    @Query("SELECT d.reparto FROM Utente d WHERE d.email = :emailDottore")
+    Optional<Department> findRepartoByEmailDottore(@Param("emailDottore") String emailDottore);
 }
 

@@ -1,6 +1,8 @@
 package hospitalApplication.service;
 
 import hospitalApplication.config.AuthenticationService;
+import hospitalApplication.models.Department;
+import hospitalApplication.models.Medicinale;
 import hospitalApplication.models.Notification;
 import hospitalApplication.models.Utente;
 import hospitalApplication.repository.NotificationRepository;
@@ -8,6 +10,7 @@ import hospitalApplication.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,11 +28,19 @@ public class NotificationService {
     }
 
     @Transactional
-    public void sendWelcomeNotification(Utente newUser) {
-        Utente sender = getAuthenticatedUser();
+    public void sendWelcomeNotification(Utente utenteAdmin, Utente newUser) {
         String message = "Benvenuto, " + newUser.getFirstName() + "! Sei stato registrato come " + newUser.getRole() + ".";
+        createAndSendNotification(utenteAdmin, newUser, message, "welcome");
+    }
+
+
+    @Transactional
+    public void sendNotificationAssignToDepartment(Utente newUser, String nomeReparto) {
+        Utente sender = getAuthenticatedUser();
+        String message = "Benvenuto, " + newUser.getFirstName() + "! Sei stato assegnato al reparto " + nomeReparto + ".";
         createAndSendNotification(sender, newUser, message, "welcome");
     }
+
 
     @Transactional
     public void notifyNewPatient(Utente doctor, Utente chief, String patientName) {
@@ -52,11 +63,6 @@ public class NotificationService {
         }
     }
 
-    @Transactional
-    public void sendNotification(Utente receiver, String message, String type) {
-        Utente sender = getAuthenticatedUser();
-        createAndSendNotification(sender, receiver, message, type);
-    }
 
     private void createAndSendNotification(Utente sender, Utente receiver, String message, String type) {
         if (receiver == null) {
@@ -75,37 +81,48 @@ public class NotificationService {
     }
 
     @Transactional
-    public void markAllNotificationsAsRead() {
+    public List<Notification> markAllNotificationsAsRead() {
         Utente user = getAuthenticatedUser();
+
         List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndLettaFalse(user.getId());
+
         if (!unreadNotifications.isEmpty()) {
-            unreadNotifications.forEach(notification -> notification.setLetta(false));
+
+            unreadNotifications.forEach(notification -> notification.setLetta(true));
             notificationRepository.saveAll(unreadNotifications);
+
             user.setCountNotification(0);
             utenteRepository.save(user);
         }
-    }
 
-    @Transactional
-    public void sendNotificationAdmin(Long adminId, String message) {
-        Utente sender = getAuthenticatedUser();
-        Utente admin = utenteRepository.findById(adminId)
-                .orElseThrow(() -> new IllegalArgumentException("Amministratore non trovato"));
-        createAndSendNotification(sender, admin, message, "admin_notification");
-    }
-
-    @Transactional
-    public void sendNotificationCapoReparto(Long chiefId, String message) {
-        Utente sender = getAuthenticatedUser();
-        Utente chief = utenteRepository.findById(chiefId)
-                .orElseThrow(() -> new IllegalArgumentException("Capo reparto non trovato"));
-        createAndSendNotification(sender, chief, message, "capo_reparto_notification");
-    }
-
-    @Transactional
-    public List<Notification> getUserNotifications() {
-        Utente user = getAuthenticatedUser();
         return notificationRepository.findByReceiverId(user.getId());
+    }
+
+
+    @Transactional
+    public void sendDoctorNotificationToCapoReparto(Utente dottore, Utente capoReparto, String nomeFarmaco) {
+        String message = "Attenzione, il farmaco"+nomeFarmaco+" è scaduto";
+        createAndSendNotification(dottore, capoReparto, message, "farmaco_scaduto");
+    }
+
+
+    @Transactional
+    public void sendNotificationSomministration(Utente dottore, Utente capoReparto, String nomeFarmaco){
+        String message = "Il dottore"+dottore.getFirstName()+" "+dottore.getLastName()+"ha somministrato il farmaco"+nomeFarmaco+"al paziente";
+        createAndSendNotification(dottore,capoReparto, message, "farmaco");
+
+    }
+
+    @Transactional
+    public void sendNotificationFerie(Utente dottore, Utente capoReparto, LocalDate dataInizioFerie, LocalDate dataFineFerie){
+        String message = "Il sottoscritto"+dottore.getFirstName()+" "+dottore.getLastName()+"sarà assente dal giorno"+dataInizioFerie+"al giorno"+dataFineFerie;
+        createAndSendNotification(dottore,capoReparto, message, "ferie");
+    }
+
+    @Transactional
+    public void sendNotificationTurni(Utente dottore, Utente capoReparto, LocalDate dataInizioFerie, LocalDate dataFineFerie){
+        String message = "Il sottoscritto"+dottore.getFirstName()+" "+dottore.getLastName()+"dovrà coprire i turni dal giorno"+dataInizioFerie+"al giorno"+dataFineFerie;
+        createAndSendNotification(dottore,capoReparto, message, "turni");
     }
 
     private Utente getAuthenticatedUser() {
@@ -116,13 +133,5 @@ public class NotificationService {
         return user;
     }
 
-    public Utente getUserById(Long userId) {
-        return utenteRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
-    }
-
-    public List<Notification> getNotificationsFromDoctors(Utente chief) {
-        return notificationRepository.findByRecipientAndSenderRole(chief, "dottore");
-    }
 
 }
